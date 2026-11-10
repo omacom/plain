@@ -31,9 +31,13 @@ ApplicationWindow {
     Settings {
         id: settings
         location: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/plain/settings.conf"
-        property int fontSize: 14
+        // Px above or below the desktop's text size, so the editor keeps
+        // following Omarchy's Text size slider after Ctrl+Plus or Ctrl+Minus.
+        property int zoom: 0
         property bool wrap: false
     }
+
+    readonly property int textSize: Math.max(8, Math.min(48, theme.textSize + settings.zoom))
 
     function save() {
         Qt.inputMethod.commit()
@@ -89,9 +93,9 @@ ApplicationWindow {
     Shortcut { sequence: "Alt+Z"; context: Qt.ApplicationShortcut; onActivated: settings.wrap = !settings.wrap }
     // Each key once: listing StandardKey.ZoomIn/ZoomOut as well registers
     // Ctrl++ and Ctrl+- twice, which Qt treats as ambiguous and ignores.
-    Shortcut { sequences: ["Ctrl+=", "Ctrl++"]; context: Qt.ApplicationShortcut; onActivated: settings.fontSize = Math.min(48, settings.fontSize + 1) }
-    Shortcut { sequence: "Ctrl+-"; context: Qt.ApplicationShortcut; onActivated: settings.fontSize = Math.max(8, settings.fontSize - 1) }
-    Shortcut { sequence: "Ctrl+0"; context: Qt.ApplicationShortcut; onActivated: settings.fontSize = 14 }
+    Shortcut { sequences: ["Ctrl+=", "Ctrl++"]; context: Qt.ApplicationShortcut; onActivated: if (win.textSize < 48) settings.zoom += 1 }
+    Shortcut { sequence: "Ctrl+-"; context: Qt.ApplicationShortcut; onActivated: if (win.textSize > 8) settings.zoom -= 1 }
+    Shortcut { sequence: "Ctrl+0"; context: Qt.ApplicationShortcut; onActivated: settings.zoom = 0 }
     Shortcut { sequences: ["F1", "Ctrl+?"]; context: Qt.ApplicationShortcut; onActivated: win.helpVisible = !win.helpVisible }
     Shortcut { sequence: "Escape"; context: Qt.ApplicationShortcut; enabled: win.helpVisible; onActivated: win.helpVisible = false }
 
@@ -148,7 +152,7 @@ ApplicationWindow {
                 objectName: "editorView"
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                fontSize: settings.fontSize
+                fontSize: win.textSize
                 wrap: settings.wrap
                 LayoutMirroring.enabled: false
                 LayoutMirroring.childrenInherit: true

@@ -126,7 +126,7 @@ Decided: Plain stays this light. Not KDE's syntax-highlighting library (300 lang
 ## Theme, font and language
 
 - `Theme` from Folio (whole palette, light mode, Hyprland rounding), followed live.
-- The font is fontconfig's `monospace`, which Omarchy points at the font picked in its menu, resolved at startup at 14px. A font change in Omarchy applies the next time Plain opens; following it live isn't worth a fontconfig watcher for an editor that's open for a minute. Ctrl+Plus and Ctrl+Minus change the size, and Plain remembers the size and word wrap in `~/.config/plain/settings.conf`. Nothing else is a setting.
+- The font is fontconfig's `monospace`, which Omarchy points at the font picked in its menu, resolved at startup, at the desktop's text size: `base-size` under `[font]` in `~/.config/omarchy/shell.toml`, else the theme's `shell.toml`, else 12px, which is what the display panel's Text size slider sets and the terminals' 9pt. It follows that live. A font change in Omarchy applies the next time Plain opens; following it live isn't worth a fontconfig watcher for an editor that's open for a minute. Ctrl+Plus and Ctrl+Minus adjust from the desktop size, and Plain remembers that adjustment and word wrap in `~/.config/plain/settings.conf`. Nothing else is a setting.
 - `Translator` from the template, every string through `qsTr()`/`tr()`, and the `.desktop` `Name` and `Comment` translated. Right-to-left languages mirror the chrome (status line, find bar, banners), never the text, which keeps its own direction per line.
 
 ## How the code splits

@@ -29,6 +29,9 @@ class Theme : public QObject {
     Q_PROPERTY(QColor orange READ orange NOTIFY changed)
     Q_PROPERTY(bool light READ light NOTIFY changed)
     Q_PROPERTY(int radius READ radius NOTIFY changed)
+    // The desktop's text size in px: what the display panel's Text size slider
+    // sets (12px there is the terminals' 9pt).
+    Q_PROPERTY(int textSize READ textSize NOTIFY changed)
 
 public:
     explicit Theme(const QString &currentDirectory = {}, QObject *parent = nullptr, const QString &hyprctl = {});
@@ -51,6 +54,10 @@ public:
     QColor orange() const { return color("orange"); }
     bool light() const { return m_light; }
     int radius() const { return m_radius; }
+    int textSize() const { return m_textSize; }
+
+    // `base-size` under `[font]` in a shell.toml, or 0 when it isn't set.
+    static int readBaseSize(const QString &path);
 
     struct Palette {
         QHash<QString, QColor> colors;
@@ -67,7 +74,9 @@ private:
     void refreshRounding();
 
     QString m_directory;
+    QString m_shellConfig;
     QHash<QString, QColor> m_colors;
+    int m_textSize = 12;
     bool m_light = false;
     QFileSystemWatcher m_watcher;
     QTimer m_debounce;

@@ -7,7 +7,7 @@ import QtQuick.Controls.Material
 Item {
     id: view
 
-    property int fontSize: 14
+    property int fontSize: 12
     property bool wrap: false
     readonly property alias textDocument: area.textDocument
     readonly property alias area: area

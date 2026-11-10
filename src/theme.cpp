@@ -42,7 +42,11 @@ double luminance(const QColor &c) {
 
 Theme::Theme(const QString &directory, QObject *parent, const QString &hyprctl)
     : QObject(parent),
-      m_directory(directory.isEmpty() ? QDir::homePath() + "/.local/state/omarchy/current" : directory) {
+      m_directory(directory.isEmpty() ? QDir::homePath() + "/.local/state/omarchy/current" : directory),
+      // `omarchy display text size` writes the user's override here; tests
+      // keep theirs beside the theme directory.
+      m_shellConfig(directory.isEmpty() ? QDir::homePath() + "/.config/omarchy/shell.toml"
+                                        : directory + "/shell.toml") {
     m_debounce.setSingleShot(true);
     m_debounce.setInterval(80);
     connect(&m_watcher, &QFileSystemWatcher::directoryChanged, this, [this] { m_debounce.start(); });
@@ -108,6 +112,22 @@ Theme::Palette Theme::readPalette(const QString &path) {
     return palette;
 }
 
+int Theme::readBaseSize(const QString &path) {
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly))
+        return 0;
+    bool inFont = false;
+    static const QRegularExpression section(R"re(^\s*\[([^\]]*)\])re");
+    static const QRegularExpression baseSize(R"re(^\s*base-size\s*=\s*([0-9]+))re");
+    for (const QString &line : QString::fromUtf8(file.readAll()).split('\n')) {
+        if (const auto match = section.match(line); match.hasMatch())
+            inFont = match.captured(1).trimmed() == "font";
+        else if (const auto match = baseSize.match(line); inFont && match.hasMatch())
+            return match.captured(1).toInt();
+    }
+    return 0;
+}
+
 QColor Theme::color(const QString &key) const {
     if (const auto it = m_colors.constFind(key); it != m_colors.constEnd())
         return *it;
@@ -148,16 +168,26 @@ void Theme::reload() {
     while (!QFileInfo::exists(ancestor) && ancestor != "/")
         ancestor = QFileInfo(ancestor).absolutePath();
     QStringList candidates{ancestor, QFileInfo(ancestor).absolutePath(), m_directory,
-                           m_directory + "/theme", m_directory + "/theme/colors.toml"};
+                           m_directory + "/theme", m_directory + "/theme/colors.toml",
+                           QFileInfo(m_shellConfig).absolutePath(), m_shellConfig};
     candidates.removeDuplicates();
     for (const auto &path : candidates)
         if (QFileInfo::exists(path))
             m_watcher.addPath(path);
 
+    // The user's override wins, then the theme's, then the shell's default,
+    // the same order the Omarchy shell resolves it in.
+    int textSize = readBaseSize(m_shellConfig);
+    if (textSize <= 0)
+        textSize = readBaseSize(m_directory + "/theme/shell.toml");
+    if (textSize <= 0)
+        textSize = 12;
+
     const Palette palette = readPalette(m_directory + "/theme/colors.toml");
-    if (palette.colors != m_colors || palette.light != m_light) {
+    if (palette.colors != m_colors || palette.light != m_light || textSize != m_textSize) {
         m_colors = palette.colors;
         m_light = palette.light;
+        m_textSize = textSize;
         emit changed();
     }
 }

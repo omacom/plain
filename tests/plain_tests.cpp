@@ -515,6 +515,23 @@ private slots:
         QTemporaryDir dir;
         Theme theme(dir.path());
         QCOMPARE(theme.accent(), QColor("#FFD60A"));
+        QCOMPARE(theme.textSize(), 12);
+    }
+
+    // The display panel's Text size: the user's override, else the theme's.
+    void themeFollowsTheDesktopTextSize()
+    {
+        QTemporaryDir dir;
+        QDir(dir.path()).mkpath("theme");
+        write(dir.path() + "/theme/shell.toml",
+              "[bar]\nbase-size = 99\n\n[font]\n# base-size = 20\nbase-size = 13\n");
+        Theme theme(dir.path());
+        QCOMPARE(theme.textSize(), 13);
+
+        write(dir.path() + "/shell.toml", "[font]\nbase-size = 16\n");
+        QTRY_COMPARE(theme.textSize(), 16);
+        QFile::remove(dir.path() + "/shell.toml");
+        QTRY_COMPARE(theme.textSize(), 13);
     }
 
     void translatorFallsBackToEnglish()

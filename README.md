@@ -44,7 +44,7 @@ Plain runs in the foreground and exits when its window closes, so it works as `$
 | Ctrl+W | Close |
 | F1 | Every shortcut |
 
-Text size and word wrap are remembered in `~/.config/plain/settings.conf`. Nothing else is a setting.
+Text starts at the desktop's text size, the one Omarchy's display panel sets (12px, the terminals' 9pt), and follows it when it changes. Ctrl+Plus and Ctrl+Minus adjust from there, and that adjustment and word wrap are remembered in `~/.config/plain/settings.conf`. Nothing else is a setting.
 
 ## Build
 
