@@ -87,8 +87,10 @@ ApplicationWindow {
     Shortcut { sequence: "Ctrl+G"; context: Qt.ApplicationShortcut; onActivated: goToLine.open() }
     Shortcut { sequence: "Ctrl+/"; context: Qt.ApplicationShortcut; enabled: doc.editable; onActivated: editor.toggleComment() }
     Shortcut { sequence: "Alt+Z"; context: Qt.ApplicationShortcut; onActivated: settings.wrap = !settings.wrap }
-    Shortcut { sequences: ["Ctrl+=", "Ctrl++", StandardKey.ZoomIn]; context: Qt.ApplicationShortcut; onActivated: settings.fontSize = Math.min(48, settings.fontSize + 1) }
-    Shortcut { sequences: ["Ctrl+-", StandardKey.ZoomOut]; context: Qt.ApplicationShortcut; onActivated: settings.fontSize = Math.max(8, settings.fontSize - 1) }
+    // Each key once: listing StandardKey.ZoomIn/ZoomOut as well registers
+    // Ctrl++ and Ctrl+- twice, which Qt treats as ambiguous and ignores.
+    Shortcut { sequences: ["Ctrl+=", "Ctrl++"]; context: Qt.ApplicationShortcut; onActivated: settings.fontSize = Math.min(48, settings.fontSize + 1) }
+    Shortcut { sequence: "Ctrl+-"; context: Qt.ApplicationShortcut; onActivated: settings.fontSize = Math.max(8, settings.fontSize - 1) }
     Shortcut { sequence: "Ctrl+0"; context: Qt.ApplicationShortcut; onActivated: settings.fontSize = 14 }
     Shortcut { sequences: ["F1", "Ctrl+?"]; context: Qt.ApplicationShortcut; onActivated: win.helpVisible = !win.helpVisible }
     Shortcut { sequence: "Escape"; context: Qt.ApplicationShortcut; enabled: win.helpVisible; onActivated: win.helpVisible = false }
