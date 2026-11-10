@@ -111,17 +111,19 @@ Item {
             rightPadding: 24
             topPadding: 8
             bottomPadding: 8
-            background: Rectangle {
-                color: theme.background
-                // The current line, faintly.
-                Rectangle {
-                    x: 0
-                    width: parent.width
-                    y: area.cursorRectangle.y
-                    height: area.cursorRectangle.height
-                    color: win.tint(theme.foreground, 0.05)
-                    visible: area.selectionStart === area.selectionEnd
-                }
+            background: Rectangle { color: theme.background }
+
+            // The current line, faintly. A child of the text (beneath it)
+            // rather than of the background, which TextArea.flickable places
+            // outside the text's coordinates, so it would sit off by the padding.
+            Rectangle {
+                z: -1
+                x: 0
+                width: Math.max(area.width, flick.width)
+                y: area.cursorRectangle.y
+                height: area.cursorRectangle.height
+                color: win.tint(theme.foreground, 0.05)
+                visible: area.selectionStart === area.selectionEnd
             }
             onContentHeightChanged: view.updateVisibleLines()
             onWidthChanged: view.updateVisibleLines()
