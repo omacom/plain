@@ -22,7 +22,7 @@ static const char *Usage = "usage: plain [+LINE] [--] [FILE]\n";
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
     app.setApplicationName("plain");
-    app.setApplicationVersion("0.1.0");
+    app.setApplicationVersion("0.2.0");
 
     const Arguments arguments = Arguments::parse(app.arguments());
     if (arguments.help) {
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
     if (arguments.version) {
-        puts("plain 0.1.0");
+        printf("plain %s\n", qPrintable(app.applicationVersion()));
         return 0;
     }
     if (!arguments.error.isEmpty()) {
