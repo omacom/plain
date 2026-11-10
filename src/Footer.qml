@@ -2,13 +2,14 @@ import QtQuick
 import QtQuick.Controls
 
 // The quiet strip under the text, laid out like Omawrite's: the file's path
-// on the left, with a lock when saving it needs sudo, and Save and Open on
-// the right. No background of its own, and faded until needed.
+// on the left, with a lock when saving it needs sudo, and Save, Open and the
+// shortcuts on the right. No background of its own, and faded until needed.
 Item {
     id: footer
 
     signal saveRequested()
     signal openRequested()
+    signal helpRequested()
 
     implicitHeight: 32
 
@@ -68,6 +69,15 @@ Item {
             opacity: 0.55
             tooltip: qsTr("Open (Ctrl+O)")
             onClicked: footer.openRequested()
+        }
+
+        FooterIconButton {
+            objectName: "helpButton"
+            iconName: "help"
+            iconColor: footer.muted
+            opacity: 0.55
+            tooltip: qsTr("Keyboard shortcuts (F1)")
+            onClicked: footer.helpRequested()
         }
     }
 }

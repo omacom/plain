@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
 
-// A small line icon in the footer: save, open, or lock. From Omawrite
-// (MIT, David Heinemeier Hansson), with the lock added.
+// A small line icon in the footer: save, open, lock or help. From Omawrite
+// (MIT, David Heinemeier Hansson), with the lock and help added.
 Item {
     id: control
 
@@ -66,6 +66,17 @@ Item {
                 context.lineTo(12.5, 13.5);
                 context.lineTo(3.5, 13.5);
                 context.closePath();
+            } else if (control.iconName === "help") {
+                // A question mark in a circle.
+                context.moveTo(13.5, 8);
+                context.arc(8, 8, 5.5, 0, 2 * Math.PI, false);
+                context.moveTo(6.3, 6.6);
+                context.quadraticCurveTo(6.4, 4.9, 8, 4.9);
+                context.quadraticCurveTo(9.7, 4.9, 9.7, 6.4);
+                context.quadraticCurveTo(9.7, 7.4, 8.6, 7.9);
+                context.quadraticCurveTo(8, 8.2, 8, 9.1);
+                context.moveTo(8, 11.1);
+                context.lineTo(8, 11.2);
             } else {
                 context.moveTo(2.5, 13);
                 context.lineTo(2.5, 3.5);

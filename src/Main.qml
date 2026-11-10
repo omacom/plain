@@ -170,6 +170,7 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 onSaveRequested: win.save()
                 onOpenRequested: win.request("open")
+                onHelpRequested: win.helpVisible = !win.helpVisible
             }
         }
 
