@@ -119,7 +119,7 @@ Item {
             Rectangle {
                 z: -1
                 x: 0
-                width: Math.max(area.width, flick.width)
+                width: Math.max(area.width, flick.width) - 16
                 y: area.cursorRectangle.y
                 height: area.cursorRectangle.height
                 color: win.tint(theme.foreground, 0.05)
