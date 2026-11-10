@@ -58,4 +58,4 @@ bin/install    # makepkg -fsi: installs the binary, icon and launcher entry
 
 ## License
 
-MIT. The theme following, translations and portal file chooser come from Omacut, Monologue and Folio.
+MIT.
