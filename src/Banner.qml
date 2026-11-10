@@ -60,55 +60,47 @@ Rectangle {
             color: theme.foreground
             wrapMode: Text.Wrap
         }
-        Button {
+        DialogButton {
             visible: banner.canSudoedit
             text: qsTr("Copy command")
-            flat: true
             onClicked: clipboard.copyText("sudoedit '" + doc.path.replace(/'/g, "'\\''") + "'")
         }
-        Button {
+        DialogButton {
             visible: banner.problem === "TooLarge"
             text: qsTr("Open anyway")
-            flat: true
             onClicked: { doc.openAnyway(); banner.done() }
         }
-        Button {
+        DialogButton {
             visible: banner.problem === "ChangedOnDisk" || banner.problem === "Conflict"
             text: qsTr("Reload")
-            flat: true
             onClicked: { doc.reload(); banner.done() }
         }
-        Button {
+        DialogButton {
             visible: banner.problem === "ChangedOnDisk"
             text: qsTr("Keep mine")
-            flat: true
             onClicked: { doc.keepMine(); banner.done() }
         }
-        Button {
+        DialogButton {
             visible: banner.problem === "Conflict" || banner.problem === "DeletedOnDisk"
             text: banner.problem === "DeletedOnDisk" ? qsTr("Save again") : qsTr("Overwrite")
-            flat: true
             onClicked: { doc.overwrite(); banner.done() }
         }
-        Button {
+        DialogButton {
             visible: banner.problem === "Retargeted"
             text: qsTr("Save there")
-            flat: true
             onClicked: { doc.overwrite(); banner.done() }
         }
-        Button {
+        DialogButton {
             visible: banner.problem === "NeedsInPlace"
             text: qsTr("Overwrite in place")
-            flat: true
             onClicked: { doc.overwriteInPlace(); banner.done() }
         }
-        Button {
+        DialogButton {
             visible: ["NotWritable", "NeedsInPlace", "Retargeted", "SaveFailed"].indexOf(banner.problem) >= 0
             text: qsTr("Save as…")
-            flat: true
             onClicked: banner.saveAsRequested()
         }
-        Button {
+        ToolButton {
             text: "✕"
             flat: true
             onClicked: {

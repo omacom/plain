@@ -16,12 +16,7 @@ Popup {
     Overlay.modal: Rectangle { color: Qt.rgba(0, 0, 0, 0.55) }
     onOpened: { field.text = ""; field.forceActiveFocus() }
 
-    background: Rectangle {
-        color: theme.background
-        border.width: 1
-        border.color: theme.accent
-        radius: theme.radius
-    }
+    background: DialogBackground {}
 
     contentItem: ColumnLayout {
         spacing: 8

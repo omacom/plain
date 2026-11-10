@@ -4,7 +4,10 @@
         <file alias="EditorView.qml">EditorView.qml</file>
         <file alias="FindBar.qml">FindBar.qml</file>
         <file alias="Banner.qml">Banner.qml</file>
-        <file alias="StatusLine.qml">StatusLine.qml</file>
+        <file alias="Footer.qml">Footer.qml</file>
+        <file alias="FooterIconButton.qml">FooterIconButton.qml</file>
+        <file alias="DialogButton.qml">DialogButton.qml</file>
+        <file alias="DialogBackground.qml">DialogBackground.qml</file>
         <file alias="HelpOverlay.qml">HelpOverlay.qml</file>
         <file alias="GoToLine.qml">GoToLine.qml</file>
         <file alias="i18n/en.json">i18n/en.json</file>

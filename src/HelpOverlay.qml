@@ -28,14 +28,10 @@ Rectangle {
 
     MouseArea { anchors.fill: parent; onClicked: overlay.dismissed() }
 
-    Rectangle {
+    DialogBackground {
         anchors.centerIn: parent
         width: Math.min(parent.width - 64, 560)
         height: content.implicitHeight + 56
-        color: theme.background
-        border.width: 1
-        border.color: theme.accent
-        radius: theme.radius
 
         ColumnLayout {
             id: content

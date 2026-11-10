@@ -207,6 +207,7 @@ bool Document::tooLarge(qint64 size, const QString &text) {
 bool Document::load(const QString &path, bool replaceUndoably) {
     if (!m_document)
         return false;
+    m_locked = false;
     auto setText = [&](const QString &text) {
         if (replaceUndoably) {
             QTextCursor cursor(m_document);
@@ -276,6 +277,7 @@ bool Document::load(const QString &path, bool replaceUndoably) {
     // letting them type changes the save will refuse.
     if (::access(QFile::encodeName(m_target).constData(), W_OK) != 0) {
         m_editable = false;
+        m_locked = true;
         setProblem(Problem::NotWritable, displayPath());
     } else {
         setProblem(decoded.mixed ? Problem::MixedEndings : Problem::None);
@@ -371,6 +373,7 @@ bool Document::saveAsUrl(const QUrl &url) {
     QByteArray bytes;
     m_diskHash = QFileInfo::exists(m_target) && readFile(m_target, &bytes) ? hash(bytes) : QByteArray();
     m_editable = true;
+    m_locked = false;
     setLanguageFor(m_path, m_document->firstBlock().text());
     emit fileChanged();
     return write(false);
@@ -406,6 +409,8 @@ bool Document::write(bool inPlace) {
 
     if (exists ? ::access(targetPath.constData(), W_OK) != 0
                : ::access(QFile::encodeName(QFileInfo(target).absolutePath()).constData(), W_OK) != 0) {
+        m_locked = true;
+        emit fileChanged();
         setProblem(Problem::NotWritable, target);
         return false;
     }

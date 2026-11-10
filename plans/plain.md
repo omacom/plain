@@ -18,7 +18,9 @@ It's built the way Hype, Monologue, Omacut, Signed and Folio are: C++ and Qt Qui
 
 ## The window
 
-A full-bleed editor on the theme background: a quiet line-number gutter, the current line faintly highlighted, the text in the theme foreground, and scrollbars. A thin status line at the bottom shows the path (home shortened to `~`), a dot when there are unsaved changes, the language, `Ln 12, Col 4`, and the indentation (`Spaces: 4` / `Tabs`). The window title is `name — Plain`, with `●` in front when modified.
+A full-bleed editor on the theme background: a quiet line-number gutter, the current line faintly highlighted, the text in the theme foreground, and scrollbars. The footer is Omawrite's, faded and with no background of its own: the file's path on the left (home shortened to `~`), with a lock when saving it needs sudo, and Save and Open icons on the right, Save brightening while there are unsaved changes. No line, column or indentation readout. The window title is `name — Plain`, with `●` in front when modified.
+
+Dialogs follow Omawrite's too: square bordered buttons with the primary one filled in the theme accent, underlined Alt+ letters, and the theme's colors and Hyprland's corner rounding.
 
 The find bar slides in above the status line (Ctrl+F), with a replace row (Ctrl+H). A banner above the editor carries the few messages that need an answer: changed or deleted on disk, can't save safely, needs root, not a text file.
 

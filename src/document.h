@@ -27,6 +27,8 @@ class Document : public QObject {
     Q_PROPERTY(QString indentUnit READ indentUnit NOTIFY fileChanged)
     Q_PROPERTY(bool modified READ modified NOTIFY modifiedChanged)
     Q_PROPERTY(bool editable READ editable NOTIFY fileChanged)
+    // The user can't write the file: saving it needs sudo.
+    Q_PROPERTY(bool locked READ locked NOTIFY fileChanged)
     Q_PROPERTY(QString problem READ problem NOTIFY problemChanged)
     Q_PROPERTY(QString problemDetail READ problemDetail NOTIFY problemChanged)
 
@@ -79,6 +81,7 @@ public:
     QString indentUnit() const { return m_indentUnit; }
     bool modified() const;
     bool editable() const { return m_editable; }
+    bool locked() const { return m_locked; }
     QString problem() const;
     QString problemDetail() const { return m_problemDetail; }
     Problem problemCode() const { return m_problem; }
@@ -139,6 +142,7 @@ private:
     QString m_language = "text";
     bool m_editable = true;
     bool m_allowLarge = false;
+    bool m_locked = false;
 
     Problem m_problem = Problem::None;
     QString m_problemDetail;

@@ -158,10 +158,10 @@ ApplicationWindow {
                 editor: editor
             }
 
-            StatusLine {
+            Footer {
                 Layout.fillWidth: true
-                editor: editor
-                wrap: settings.wrap
+                onSaveRequested: win.save()
+                onOpenRequested: win.request("open")
             }
         }
 
@@ -180,13 +180,15 @@ ApplicationWindow {
         onClosed: editor.focusText()
     }
 
-    // Unsaved changes: Save, Don't save, Cancel. Escape cancels.
+    // Unsaved changes: Cancel, Discard, Save, laid out like Omawrite's.
+    // Escape cancels; Alt+C, Alt+D and Alt+S pick.
     Popup {
         id: unsaved
         anchors.centerIn: parent
+        width: Math.min(440, win.width - 48)
         modal: true
         focus: true
-        padding: 24
+        padding: 22
         onOpened: saveButton.forceActiveFocus()
         onClosed: if (win.pendingAction.length > 0 && !choosing) { win.pendingAction = ""; editor.focusText() }
         property bool choosing: false
@@ -210,39 +212,54 @@ ApplicationWindow {
             }
         }
 
-        background: Rectangle {
-            color: theme.background
-            border.width: 1
-            border.color: theme.accent
-            radius: theme.radius
-        }
+        Shortcut { sequence: "Alt+C"; enabled: unsaved.opened; onActivated: unsaved.choose("cancel") }
+        Shortcut { sequence: "Alt+D"; enabled: unsaved.opened; onActivated: unsaved.choose("discard") }
+        Shortcut { sequence: "Alt+S"; enabled: unsaved.opened; onActivated: unsaved.choose("save") }
+
+        background: DialogBackground {}
 
         contentItem: ColumnLayout {
-            spacing: 14
-            Text {
-                text: qsTr("Save changes to %1?").arg(doc.fileName)
+            spacing: 12
+            Label {
+                text: qsTr("Unsaved changes")
                 color: theme.brightForeground
                 font.pixelSize: 16
-                font.weight: Font.DemiBold
+                font.bold: true
             }
-            Text {
-                text: qsTr("Your changes will be lost if you don't save them.")
+            Label {
+                Layout.fillWidth: true
+                text: win.pendingAction === "open"
+                    ? qsTr("Save changes to %1 before opening another file?").arg(doc.fileName)
+                    : qsTr("Save changes to %1 before closing?").arg(doc.fileName)
                 color: theme.foreground
+                wrapMode: Text.Wrap
+                font.pixelSize: 13
             }
             RowLayout {
                 Layout.alignment: Qt.AlignRight
+                Layout.topMargin: 14
                 spacing: 8
-                Button { text: qsTr("Cancel"); flat: true; onClicked: unsaved.choose("cancel") }
-                Button { text: qsTr("Don't save"); flat: true; onClicked: unsaved.choose("discard") }
-                Button {
+                DialogButton {
+                    id: cancelButton
+                    text: qsTr("Cancel")
+                    formattedText: qsTr("<u>C</u>ancel")
+                    KeyNavigation.tab: discardButton
+                    onClicked: unsaved.choose("cancel")
+                }
+                DialogButton {
+                    id: discardButton
+                    text: qsTr("Discard")
+                    formattedText: qsTr("<u>D</u>iscard")
+                    KeyNavigation.tab: saveButton
+                    onClicked: unsaved.choose("discard")
+                }
+                DialogButton {
                     id: saveButton
+                    primary: true
                     text: qsTr("Save")
-                    highlighted: true
-                    Material.background: theme.accent
-                    Material.foreground: theme.accentForeground
+                    formattedText: qsTr("<u>S</u>ave")
+                    KeyNavigation.tab: cancelButton
                     onClicked: unsaved.choose("save")
-                    Keys.onReturnPressed: unsaved.choose("save")
-                    Keys.onEnterPressed: unsaved.choose("save")
                 }
             }
         }

@@ -311,6 +311,7 @@ private slots:
         QVERIFY(doc.open(path));
         QCOMPARE(doc.problem(), QString("NotWritable"));
         QVERIFY(!doc.editable());
+        QVERIFY(doc.locked());
         QVERIFY(!doc.save());
         QCOMPARE(read(path), QByteArray("a\n"));
 
@@ -319,6 +320,7 @@ private slots:
         write(later, "a\n");
         QVERIFY(doc.open(later));
         QVERIFY(doc.editable());
+        QVERIFY(!doc.locked());
         QFile::setPermissions(later, QFile::ReadOwner);
         append(&text, "b\n");
         QVERIFY(!doc.save());
