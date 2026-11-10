@@ -109,7 +109,7 @@ Item {
             tabStopDistance: metrics.averageCharacterWidth * 4
             leftPadding: 4
             rightPadding: 24
-            topPadding: 8
+            topPadding: 16
             bottomPadding: 8
             background: Rectangle { color: theme.background }
 
