@@ -17,6 +17,7 @@
 #include "arguments.h"
 #include "document.h"
 #include "editing.h"
+#include "filepicker.h"
 #include "highlighter.h"
 #include "theme.h"
 #include "translator.h"
@@ -498,6 +499,13 @@ private slots:
         QCOMPARE(editing.find("=", 13, false, false), QVariantList({2, 3})); // wraps around
         QCOMPARE(editing.lineOf(7), 2);
         QCOMPARE(editing.positionOfLine(2), 6);
+    }
+
+    // QML calls these from Ctrl+O and Ctrl+S; plain C++ methods it can't.
+    void filePickerIsCallableFromQml()
+    {
+        QVERIFY(FilePicker::staticMetaObject.indexOfMethod("openFile(QString)") >= 0);
+        QVERIFY(FilePicker::staticMetaObject.indexOfMethod("saveFile(QString)") >= 0);
     }
 
     // Theme and translator, from the template.

@@ -5,6 +5,6 @@ TEMPLATE = app
 
 INCLUDEPATH += ../src
 
-HEADERS += ../src/arguments.h ../src/document.h ../src/editing.h ../src/highlighter.h ../src/theme.h ../src/translator.h
+HEADERS += ../src/filepicker.h ../src/arguments.h ../src/document.h ../src/editing.h ../src/highlighter.h ../src/theme.h ../src/translator.h
 SOURCES += plain_tests.cpp ../src/arguments.cpp ../src/document.cpp ../src/editing.cpp ../src/highlighter.cpp \
     ../src/theme.cpp ../src/translator.cpp

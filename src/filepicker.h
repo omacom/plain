@@ -12,8 +12,9 @@ public:
     explicit FilePicker(QObject *parent = nullptr) : QObject(parent) {}
     virtual ~FilePicker() = default;
 
-    virtual void openFile(const QString &folder) = 0;
-    virtual void saveFile(const QString &suggestedPath) = 0;
+    // Invokable, since QML's Ctrl+O and Ctrl+S call them.
+    Q_INVOKABLE virtual void openFile(const QString &folder) = 0;
+    Q_INVOKABLE virtual void saveFile(const QString &suggestedPath) = 0;
 
 signals:
     void openSelected(const QUrl &url);
