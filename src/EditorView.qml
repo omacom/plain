@@ -85,7 +85,10 @@ Item {
         anchors.right: parent.right
         clip: true
         boundsBehavior: Flickable.StopAtBounds
-        contentWidth: area.implicitWidth
+        // Wrapping text is as wide as the view. Following the text's own
+        // width instead would keep it at the longest unwrapped line after
+        // wrap was turned off and on again, so it never wrapped again.
+        contentWidth: view.wrap ? width : area.implicitWidth
         contentHeight: area.implicitHeight
         onContentYChanged: view.updateVisibleLines()
         onHeightChanged: view.updateVisibleLines()
