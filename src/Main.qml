@@ -180,44 +180,69 @@ ApplicationWindow {
         onClosed: editor.focusText()
     }
 
-    // Unsaved changes: Save, Don't save, Cancel.
-    Dialog {
+    // Unsaved changes: Save, Don't save, Cancel. Escape cancels.
+    Popup {
         id: unsaved
         anchors.centerIn: parent
         modal: true
-        title: qsTr("Save changes to %1?").arg(doc.fileName)
-        Label {
-            text: qsTr("Your changes will be lost if you don't save them.")
-            color: theme.foreground
-        }
-        footer: DialogButtonBox {
-            Button {
-                text: qsTr("Save")
-                highlighted: true
-                DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
-            }
-            Button {
-                text: qsTr("Don't save")
-                DialogButtonBox.buttonRole: DialogButtonBox.DestructiveRole
-            }
-            Button {
-                text: qsTr("Cancel")
-                DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
-            }
-            onClicked: function(button) {
-                const role = button.DialogButtonBox.buttonRole
-                unsaved.close()
-                if (role === DialogButtonBox.AcceptRole) {
-                    // An untitled file finishes in onSaveSelected; a failed
-                    // save leaves the banner up and the window open.
-                    if (win.save())
-                        win.finish(win.pendingAction)
-                } else if (role === DialogButtonBox.DestructiveRole) {
-                    win.discardConfirmed = win.pendingAction === "close"
+        focus: true
+        padding: 24
+        onOpened: saveButton.forceActiveFocus()
+        onClosed: if (win.pendingAction.length > 0 && !choosing) { win.pendingAction = ""; editor.focusText() }
+        property bool choosing: false
+        Overlay.modal: Rectangle { color: Qt.rgba(0, 0, 0, 0.55) }
+
+        function choose(choice) {
+            choosing = true
+            close()
+            choosing = false
+            if (choice === "save") {
+                // An untitled file finishes in onSaveSelected; a failed
+                // save leaves the banner up and the window open.
+                if (win.save())
                     win.finish(win.pendingAction)
-                } else {
-                    win.pendingAction = ""
-                    editor.focusText()
+            } else if (choice === "discard") {
+                win.discardConfirmed = win.pendingAction === "close"
+                win.finish(win.pendingAction)
+            } else {
+                win.pendingAction = ""
+                editor.focusText()
+            }
+        }
+
+        background: Rectangle {
+            color: theme.background
+            border.width: 1
+            border.color: theme.accent
+            radius: theme.radius
+        }
+
+        contentItem: ColumnLayout {
+            spacing: 14
+            Text {
+                text: qsTr("Save changes to %1?").arg(doc.fileName)
+                color: theme.brightForeground
+                font.pixelSize: 16
+                font.weight: Font.DemiBold
+            }
+            Text {
+                text: qsTr("Your changes will be lost if you don't save them.")
+                color: theme.foreground
+            }
+            RowLayout {
+                Layout.alignment: Qt.AlignRight
+                spacing: 8
+                Button { text: qsTr("Cancel"); flat: true; onClicked: unsaved.choose("cancel") }
+                Button { text: qsTr("Don't save"); flat: true; onClicked: unsaved.choose("discard") }
+                Button {
+                    id: saveButton
+                    text: qsTr("Save")
+                    highlighted: true
+                    Material.background: theme.accent
+                    Material.foreground: theme.accentForeground
+                    onClicked: unsaved.choose("save")
+                    Keys.onReturnPressed: unsaved.choose("save")
+                    Keys.onEnterPressed: unsaved.choose("save")
                 }
             }
         }

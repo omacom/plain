@@ -62,7 +62,7 @@ Editing keys (Enter, Tab, Escape, Ctrl+/) are handled on the editor itself, not 
 - The whole file must be valid UTF-8 with no NUL bytes. Anything else is reported as not a text file and doesn't open: there is no lossy read-only mode that could later be saved.
 - Plain runs in the foreground and exits when its window closes, so it works as `$EDITOR`, `$VISUAL` and `$SUDO_EDITOR` (git commit, crontab -e, sudoedit). There's no single-instance daemon. Closing without saving leaves the file as it was, which is how git and crontab already detect an abort.
 - Indentation is detected from the file (tabs or spaces, and the width from the most common leading indent). New files use 4 spaces, or 2 for YAML and JSON.
-- Large files: phase 1 measures `TextEdit` with the shapes that hurt (one multi-megabyte line, 200,000 short lines, wrapping on, highlighting on) and sets the size Plain asks before opening from what it finds.
+- Large files: measured on Qt 6.12 (offscreen, open + jump to end + type). With highlighting, 2,000 lines open in 0.12 s and 10,000 in 0.8 s; 80,000 take 14 s, and Qt Quick's `TextEdit` itself is most of that. One 20 KB line opens in 0.75 s, one 100 KB line takes 30 s. So Plain asks first ("Open anyway") for files over 1 MB or with a line over 20,000 characters.
 
 ### Text in, text out
 
@@ -80,13 +80,13 @@ All in C++ (`Document`), tested against real files in temp directories.
 
 - **The visible path and the save target are separate.** At open, Plain resolves symlinks to the target and remembers both. Before every save it resolves again; if the link now points somewhere else, that's a conflict to ask about, never a quiet save into a different file.
 - **Atomic by default**: `QSaveFile` beside the target, then rename. That keeps the ordinary permission bits and nothing else, because the rename makes a new inode.
-- **When a rename would lose something, ask.** Plain checks for these before saving: the folder isn't writable, the file has more than one hard link, it's owned by someone else (a group-writable file), or it carries extended attributes or ACLs. Then the banner says why and offers **Overwrite in place**, which truncates and writes the existing file. It is never a silent fallback.
+- **When a rename would lose something, ask.** Plain checks for these before saving: the folder isn't writable, the file has more than one hard link, it's owned by someone else (a group-writable file), it has setuid, setgid or sticky bits (`QSaveFile` keeps ordinary permission bits but drops these), or it carries extended attributes or ACLs. Then the banner says why and offers **Overwrite in place**, which truncates and writes the existing file, then restores its mode, since the kernel clears setuid and setgid when a non-root user writes a file. It is never a silent fallback.
 - **Never over an unseen version.** Plain remembers a hash of the bytes it last read or wrote. Right before saving, it re-reads the target; if the hash differs, or the file is gone, the save stops and the banner offers **Overwrite** or **Reload**. Overwrite acknowledges that one disk version only.
 - **No backup, swap or recovery files.** Config files carry secrets, and a crash losing unsaved edits is the same deal nano and gedit offer. Undo is per session.
 
 ### Files Plain can't write
 
-When the target isn't writable by the user, the banner says so: the file belongs to root (or another user), and `sudoedit` is the way to edit it, with a button that copies `sudoedit <path>`. Plain itself never escalates in 0.1.
+When the target isn't writable by the user, it opens read-only and the banner says so: the file belongs to root (or another user), and `sudoedit` is the way to edit it, with a button that copies `sudoedit <path>`. Save as still works. Plain itself never escalates in 0.1.
 
 Saving as root from inside the app means a privileged helper, and a shell script run through `pkexec` can't do that safely: there's a race between resolving and checking a path the user controls and replacing it. If it comes back, it's a separate design (a small compiled helper working on file descriptors, with a narrowly bound polkit action and admin authentication on every save), reviewed on its own.
 
@@ -106,7 +106,7 @@ Unsaved changes ask Save, Don't save or Cancel, from Ctrl+W, Ctrl+Q and the wind
 
 ## Syntax highlighting
 
-Plain has its own `QSyntaxHighlighter` with a rule set per language, attached to the `TextEdit`'s document through `QQuickTextDocument`. Recoloring never touches the text or the modified state. Colors come from the theme: comments `secondaryForeground`, strings `green`, numbers `orange`, keys `blue`, sections and keywords `magenta`, booleans and constants `yellow`. No linting, no error colors.
+Plain colors the `TextEdit`'s document itself, with one small scanner told per language which comment, string and key forms exist. It started as a `QSyntaxHighlighter`, but that marks every block dirty separately and Qt Quick's `TextEdit` relays out on each, which made a 10,000-line file take 10 seconds to open. Plain sets each block's formats with `QTextLayout::setFormats` and marks the changed range dirty once; edits recolor from the changed line on, for as long as the state carried to the next line keeps changing. Recoloring never touches the text or the modified state. Colors come from the theme: comments `secondaryForeground`, strings `green`, numbers `orange`, keys `blue`, sections and keywords `magenta`, booleans and constants `yellow`. No linting, no error colors.
 
 Languages, picked by file name, then extension, then a shebang:
 
@@ -149,6 +149,12 @@ Edits go through `QTextCursor` edit blocks on the shared `QTextDocument`. A spik
 The gutter finds the first and last visible blocks with `TextEdit.positionAt` at the viewport's top and bottom, and draws numbers only for that range, positioned with `positionToRectangle`. It updates on scroll, resize, font size and wrap changes, so its cost doesn't grow with the file. The view keeps the cursor visible as it moves, and dragging a selection past the edge scrolls.
 
 No agent CLI (`plain check`, `plain render`): agents already edit text files directly, and Plain adds nothing to that.
+
+## Where it stands (0.1.0)
+
+Phase 1 is built: everything in it below, with 37 Qt Test cases (byte-identical round trips, every save safety case, disk changes, arguments, highlighting, and each edit through a real QML `TextEdit` with undo and redo), and checked offscreen in dark and light themes. The editor is Controls' `TextArea` attached to a `Flickable` (`TextArea.flickable`): a `TextEdit` underneath, which also keeps the cursor in view, autoscrolls a selection and brings Qt's standard right-click menu.
+
+Not yet checked: on a real Hyprland session (portal dialogs, IME with fcitx5, Hyprland rounding), and translations beyond English.
 
 ## Phases
 

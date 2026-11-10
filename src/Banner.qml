@@ -25,6 +25,7 @@ Rectangle {
         case "NotRegular": return qsTr("%1 isn't a file Plain can open.").arg(detail)
         case "NotReadable": return qsTr("You don't have permission to read %1. To edit it as administrator, run sudoedit in a terminal.").arg(detail)
         case "NotText": return qsTr("%1 isn't a UTF-8 text file, so Plain didn't open it.").arg(detail)
+        case "TooLarge": return qsTr("%1 is large or has very long lines. Plain is made for config files and may be slow with it.").arg(detail)
         case "MixedEndings": return qsTr("This file mixes Windows and Unix line endings. Saving will use %1 throughout.").arg(doc.lineEnding)
         case "ChangedOnDisk": return qsTr("%1 changed on disk.").arg(detail)
         case "DeletedOnDisk": return qsTr("%1 was deleted on disk.").arg(detail)
@@ -64,6 +65,12 @@ Rectangle {
             text: qsTr("Copy command")
             flat: true
             onClicked: clipboard.copyText("sudoedit '" + doc.path.replace(/'/g, "'\\''") + "'")
+        }
+        Button {
+            visible: banner.problem === "TooLarge"
+            text: qsTr("Open anyway")
+            flat: true
+            onClicked: { doc.openAnyway(); banner.done() }
         }
         Button {
             visible: banner.problem === "ChangedOnDisk" || banner.problem === "Conflict"

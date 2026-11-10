@@ -6,6 +6,7 @@
 #include <QQuickTextDocument>
 #include <QSignalSpy>
 #include <QTemporaryDir>
+#include <QTextCursor>
 #include <QTextDocument>
 #include <QtTest>
 
@@ -86,6 +87,28 @@ private slots:
         QTextDocument document;
         document.setPlainText(decoded.text);
         QCOMPARE(Document::encode(&document, decoded.bom, decoded.crlf), bytes);
+    }
+
+    void asksBeforeOpeningLargeFiles()
+    {
+        QVERIFY(!Document::tooLarge(1000, "a\nb\n"));
+        QVERIFY(Document::tooLarge(Document::LargeFileBytes + 1, "a"));
+        QVERIFY(Document::tooLarge(30000, QString(Document::LongLineChars + 1, 'x')));
+        QVERIFY(Document::tooLarge(30000, "a\n" + QString(Document::LongLineChars + 1, 'x')));
+
+        QTemporaryDir dir;
+        const QString path = dir.filePath("long.json");
+        write(path, QByteArray(Document::LongLineChars + 10, 'x'));
+        QTextDocument text;
+        Document doc;
+        doc.attachDocument(&text);
+        QVERIFY(!doc.open(path));
+        QCOMPARE(doc.problem(), QString("TooLarge"));
+        QVERIFY(text.isEmpty());
+        doc.openAnyway();
+        QCOMPARE(doc.problem(), QString("None"));
+        QCOMPARE(text.characterCount() - 1, Document::LongLineChars + 10);
+        QVERIFY(doc.editable());
     }
 
     void detectsIndentation()
@@ -286,6 +309,17 @@ private slots:
         Document doc;
         doc.attachDocument(&text);
         QVERIFY(doc.open(path));
+        QCOMPARE(doc.problem(), QString("NotWritable"));
+        QVERIFY(!doc.editable());
+        QVERIFY(!doc.save());
+        QCOMPARE(read(path), QByteArray("a\n"));
+
+        // Writable at open, read-only by save time: the save says so.
+        const QString later = dir.filePath("later.conf");
+        write(later, "a\n");
+        QVERIFY(doc.open(later));
+        QVERIFY(doc.editable());
+        QFile::setPermissions(later, QFile::ReadOwner);
         append(&text, "b\n");
         QVERIFY(!doc.save());
         QCOMPARE(doc.problem(), QString("NotWritable"));

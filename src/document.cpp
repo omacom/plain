@@ -180,7 +180,28 @@ bool Document::openUrl(const QUrl &url) {
 bool Document::open(const QString &path) {
     // Absolute, but not canonical: the user opened the link, not its target.
     m_path = QFileInfo(path).absoluteFilePath();
+    m_allowLarge = false;
     return load(m_path, false);
+}
+
+void Document::openAnyway() {
+    m_allowLarge = true;
+    load(m_path, false);
+}
+
+bool Document::tooLarge(qint64 size, const QString &text) {
+    if (size > LargeFileBytes)
+        return true;
+    qsizetype start = 0;
+    while (start <= text.size()) {
+        qsizetype end = text.indexOf('\n', start);
+        if (end < 0)
+            end = text.size();
+        if (end - start > LongLineChars)
+            return true;
+        start = end + 1;
+    }
+    return false;
 }
 
 bool Document::load(const QString &path, bool replaceUndoably) {
@@ -238,6 +259,8 @@ bool Document::load(const QString &path, bool replaceUndoably) {
     const Decoded decoded = decode(bytes);
     if (!decoded.ok)
         return refuse(Problem::NotText);
+    if (!m_allowLarge && tooLarge(bytes.size(), decoded.text))
+        return refuse(Problem::TooLarge);
 
     if (replaceUndoably)
         emit aboutToReload();
@@ -249,7 +272,14 @@ bool Document::load(const QString &path, bool replaceUndoably) {
     setText(decoded.text);
     setLanguageFor(path, decoded.text.left(decoded.text.indexOf('\n')));
     m_indentUnit = decoded.indentUnit.isEmpty() ? Highlighter::defaultIndent(m_language) : decoded.indentUnit;
-    setProblem(decoded.mixed ? Problem::MixedEndings : Problem::None);
+    // A file the user can't write opens read-only, saying so, rather than
+    // letting them type changes the save will refuse.
+    if (::access(QFile::encodeName(m_target).constData(), W_OK) != 0) {
+        m_editable = false;
+        setProblem(Problem::NotWritable, displayPath());
+    } else {
+        setProblem(decoded.mixed ? Problem::MixedEndings : Problem::None);
+    }
     watch();
     emit fileChanged();
     if (replaceUndoably)

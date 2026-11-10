@@ -53,15 +53,11 @@ Item {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        width: Math.max(3, String(editing.lineCount()).length) * metrics.averageCharacterWidth + 28
+        // Reading area.length re-evaluates this as the text changes, so the
+        // width follows the number of digits in the line count.
+        width: { area.length; return Math.max(3, String(editing.lineCount()).length) * metrics.averageCharacterWidth + 28 }
         color: theme.background
         clip: true
-
-        // Recomputed with the text, so the width follows the line count.
-        Connections {
-            target: area
-            function onLengthChanged() { gutter.width = Math.max(3, String(editing.lineCount()).length) * metrics.averageCharacterWidth + 28 }
-        }
 
         Repeater {
             model: Math.max(0, view.lastLine - view.firstLine + 1)

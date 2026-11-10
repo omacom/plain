@@ -4,6 +4,9 @@
 
 #include <QFileInfo>
 #include <QSet>
+#include <QTextBlock>
+#include <QTextDocument>
+#include <QTextLayout>
 #include <functional>
 
 namespace {
@@ -335,8 +338,13 @@ int scan(const Spec &s, const QString &text, int state, const Emit &emitToken) {
 }
 }
 
-Highlighter::Highlighter(QTextDocument *document, Theme *theme) : QSyntaxHighlighter(document), m_theme(theme) {
+Highlighter::Highlighter(QTextDocument *document, Theme *theme)
+    : QObject(document), m_document(document), m_theme(theme) {
     updateFormats();
+    connect(document, &QTextDocument::contentsChange, this, [this](int from, int, int added) {
+        if (!m_marking)
+            highlight(from, from + added);
+    });
     if (theme)
         connect(theme, &Theme::changed, this, [this] {
             updateFormats();
@@ -349,6 +357,47 @@ void Highlighter::setLanguage(const QString &language) {
         return;
     m_language = language;
     rehighlight();
+}
+
+void Highlighter::rehighlight() {
+    highlight(0, m_document->characterCount());
+}
+
+// Colors the blocks from `from` to `to`, and on past them while the state a
+// block hands the next one keeps changing (an opened or closed multi-line
+// comment). Like QSyntaxHighlighter, except the TextEdit hears about it once:
+// QSyntaxHighlighter marks every block dirty separately, and Qt Quick's
+// TextEdit relays out on each, which made a 10,000-line file take seconds.
+void Highlighter::highlight(int from, int to) {
+    const Spec &language = spec(m_language);
+    const bool none = m_language == "text";
+    QTextBlock block = m_document->findBlock(from);
+    if (!block.isValid())
+        return;
+    const int start = block.position();
+    int end = start;
+    int state = block.previous().isValid() ? qMax(0, block.previous().userState()) : 0;
+
+    for (; block.isValid(); block = block.next()) {
+        const bool inRange = block.position() <= to;
+        QList<QTextLayout::FormatRange> ranges;
+        int next = 0;
+        if (!none)
+            next = scan(language, block.text(), state, [&](qsizetype at, qsizetype length, Token token) {
+                ranges.append({int(at), int(length), m_formats[token]});
+            });
+        const int previousNext = block.userState();
+        block.layout()->setFormats(ranges);
+        block.setUserState(next);
+        end = block.position() + block.length();
+        state = next;
+        if (!inRange && next == previousNext)
+            break;
+    }
+
+    m_marking = true;
+    m_document->markContentsDirty(start, qMin(end, m_document->characterCount()) - start);
+    m_marking = false;
 }
 
 void Highlighter::updateFormats() {
@@ -369,17 +418,6 @@ void Highlighter::updateFormats() {
         m_formats[t].setForeground(colors[t]);
     }
     m_formats[Comment].setFontItalic(true);
-}
-
-void Highlighter::highlightBlock(const QString &text) {
-    if (m_language == "text")
-        return;
-    const int previous = previousBlockState();
-    const int next = scan(spec(m_language), text, previous < 0 ? Normal : previous,
-                          [this](qsizetype start, qsizetype length, Token token) {
-                              setFormat(int(start), int(length), m_formats[token]);
-                          });
-    setCurrentBlockState(next);
 }
 
 QString Highlighter::tokens(const QString &language, const QStringList &lines) {

@@ -39,6 +39,7 @@ public:
         NotRegular,      // a folder, device or pipe
         NotReadable,     // permission denied: belongs to root or someone else
         NotText,         // not UTF-8, NUL bytes, lone CRs, or U+2029
+        TooLarge,        // big enough that TextEdit would be slow; asks first
         MixedEndings,    // opened fine; will be saved with the majority ending
         ChangedOnDisk,   // changed elsewhere while there are unsaved edits
         DeletedOnDisk,   // removed elsewhere
@@ -98,6 +99,14 @@ public:
     Q_INVOKABLE void reload();           // ChangedOnDisk, Conflict
     Q_INVOKABLE void keepMine();         // ChangedOnDisk
     Q_INVOKABLE void dismissProblem();
+    Q_INVOKABLE void openAnyway();       // TooLarge
+
+    // Measured on Qt 6.12: Qt Quick's TextEdit opens a 1 MB config in about
+    // a second and a 20,000-character line in under one, but a 100 KB line
+    // takes half a minute. Past these, Plain asks before opening.
+    static constexpr qint64 LargeFileBytes = 1024 * 1024;
+    static constexpr int LongLineChars = 20000;
+    static bool tooLarge(qint64 size, const QString &text);
 
 signals:
     void fileChanged();
@@ -129,6 +138,7 @@ private:
     QString m_indentUnit = "    ";
     QString m_language = "text";
     bool m_editable = true;
+    bool m_allowLarge = false;
 
     Problem m_problem = Problem::None;
     QString m_problemDetail;

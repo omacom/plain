@@ -13,6 +13,7 @@ Popup {
     modal: true
     focus: true
     padding: 16
+    Overlay.modal: Rectangle { color: Qt.rgba(0, 0, 0, 0.55) }
     onOpened: { field.text = ""; field.forceActiveFocus() }
 
     background: Rectangle {
