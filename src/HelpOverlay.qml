@@ -39,7 +39,7 @@ Rectangle {
             anchors.margins: 28
             spacing: 14
 
-            Text { text: qsTr("Keyboard shortcuts"); color: theme.brightForeground; font.pixelSize: 16; font.weight: Font.DemiBold }
+            Text { text: qsTr("Keyboard shortcuts"); color: theme.brightForeground; font.pixelSize: Math.round(theme.textSize * 1.333); font.weight: Font.DemiBold }
 
             GridLayout {
                 columns: 2

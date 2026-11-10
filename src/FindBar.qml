@@ -15,7 +15,7 @@ Rectangle {
     readonly property int matches: { doc.modified; findField.text; bar.caseSensitive; return visible ? editing.matchCount(findField.text, caseSensitive) : 0 }
 
     visible: false
-    implicitHeight: column.implicitHeight + 16
+    implicitHeight: column.implicitHeight + 12
     color: theme.darkBackground
 
     function show(replace) {
@@ -65,18 +65,17 @@ Rectangle {
     ColumnLayout {
         id: column
         anchors.fill: parent
-        anchors.margins: 8
+        anchors.margins: 6
         anchors.leftMargin: 12
         anchors.rightMargin: 12
         spacing: 6
 
         RowLayout {
             spacing: 8
-            TextField {
+            FindField {
                 id: findField
                 Layout.fillWidth: true
-                placeholderText: qsTr("Find")
-                selectByMouse: true
+                placeholder: qsTr("Find")
                 onTextEdited: {
                     bar.replaced = ""
                     // Find as you type, from where the current match starts.
@@ -95,35 +94,32 @@ Rectangle {
                     : bar.matches === 0 ? qsTr("No matches") : qsTr("%n matches", "", bar.matches)
                 color: bar.replaced.length === 0 && bar.matches === 0 ? theme.red : theme.secondaryForeground
             }
-            Button {
+            BarButton {
                 text: "Aa"
-                flat: true
                 checkable: true
                 checked: bar.caseSensitive
-                onToggled: bar.caseSensitive = checked
-                ToolTip.visible: hovered
-                ToolTip.text: qsTr("Match case")
+                onClicked: bar.caseSensitive = checked
+                tooltip: qsTr("Match case")
             }
-            ToolButton { text: "↑"; onClicked: bar.next(true); ToolTip.visible: hovered; ToolTip.text: qsTr("Previous (Shift+Enter)") }
-            ToolButton { text: "↓"; onClicked: bar.next(false); ToolTip.visible: hovered; ToolTip.text: qsTr("Next (Enter)") }
-            ToolButton { text: "✕"; onClicked: bar.hide(); ToolTip.visible: hovered; ToolTip.text: qsTr("Close (Escape)") }
+            BarButton { text: "↑"; onClicked: bar.next(true); tooltip: qsTr("Previous (Shift+Enter)") }
+            BarButton { text: "↓"; onClicked: bar.next(false); tooltip: qsTr("Next (Enter)") }
+            BarButton { text: "✕"; onClicked: bar.hide(); tooltip: qsTr("Close (Escape)") }
         }
 
         RowLayout {
             visible: bar.replacing
             spacing: 8
-            TextField {
+            FindField {
                 id: replaceField
                 Layout.fillWidth: true
-                placeholderText: qsTr("Replace with")
-                selectByMouse: true
+                placeholder: qsTr("Replace with")
                 enabled: doc.editable
                 Keys.onReturnPressed: bar.replaceOne()
                 Keys.onEnterPressed: bar.replaceOne()
                 Keys.onEscapePressed: bar.hide()
             }
-            Button { text: qsTr("Replace"); flat: true; enabled: doc.editable && findField.text.length > 0; onClicked: bar.replaceOne() }
-            Button { text: qsTr("Replace all"); flat: true; enabled: doc.editable && findField.text.length > 0; onClicked: bar.replaceAll() }
+            BarButton { text: qsTr("Replace"); enabled: doc.editable && findField.text.length > 0; onClicked: bar.replaceOne() }
+            BarButton { text: qsTr("Replace all"); enabled: doc.editable && findField.text.length > 0; onClicked: bar.replaceAll() }
         }
     }
 }

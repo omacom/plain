@@ -13,6 +13,8 @@ ApplicationWindow {
     visible: true
     title: (doc.modified ? "● " : "") + doc.fileName + " — Plain"
     color: theme.background
+    // The chrome (banner, dialogs, labels) at the desktop's text size too.
+    font.pixelSize: theme.textSize
 
     Material.theme: theme.light ? Material.Light : Material.Dark
     Material.accent: theme.accent
@@ -229,7 +231,7 @@ ApplicationWindow {
             Label {
                 text: qsTr("Unsaved changes")
                 color: theme.brightForeground
-                font.pixelSize: 16
+                font.pixelSize: Math.round(theme.textSize * 1.333)
                 font.bold: true
             }
             Label {
@@ -239,7 +241,7 @@ ApplicationWindow {
                     : qsTr("Save changes to %1 before closing?").arg(doc.fileName)
                 color: theme.foreground
                 wrapMode: Text.Wrap
-                font.pixelSize: 13
+                font.pixelSize: theme.textSize
             }
             RowLayout {
                 Layout.alignment: Qt.AlignRight

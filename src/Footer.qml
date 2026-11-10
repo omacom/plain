@@ -32,7 +32,7 @@ Item {
             textFormat: Text.PlainText
             text: doc.displayPath.length > 0 ? doc.displayPath : qsTr("Untitled")
             color: footer.muted
-            font.pixelSize: 12
+            font.pixelSize: theme.textSize
         }
 
         FooterIconButton {
