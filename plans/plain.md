@@ -121,6 +121,8 @@ Languages, picked by file name, then extension, then a shebang:
 
 Strings are matched with escapes, comments don't start inside strings, and multi-line constructs carry the highlighter's block state. Each language has tests for those cases.
 
+Decided: Plain stays this light. Not KDE's syntax-highlighting library (300 languages, about 10 MB, and its own highlighter class has the same Qt Quick slowdown) and not tree-sitter (a compiled grammar per language). A language is added to the scanner when someone needs it, with its tests.
+
 ## Theme, font and language
 
 - `Theme` from Folio (whole palette, light mode, Hyprland rounding), followed live.
