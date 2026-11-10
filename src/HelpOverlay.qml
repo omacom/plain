@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 
 // Every shortcut, one keypress away (F1).
@@ -39,7 +40,7 @@ Rectangle {
             anchors.margins: 28
             spacing: 14
 
-            Text { text: qsTr("Keyboard shortcuts"); color: theme.brightForeground; font.pixelSize: Math.round(theme.textSize * 1.333); font.weight: Font.DemiBold }
+            Label { text: qsTr("Keyboard shortcuts"); color: theme.brightForeground; font.pixelSize: Math.round(theme.textSize * 1.333); font.weight: Font.DemiBold }
 
             GridLayout {
                 columns: 2
@@ -47,7 +48,7 @@ Rectangle {
                 columnSpacing: 28
                 Repeater {
                     model: overlay.shortcuts
-                    delegate: Text {
+                    delegate: Label {
                         required property var modelData
                         required property int index
                         Layout.row: index
@@ -58,7 +59,7 @@ Rectangle {
                 }
                 Repeater {
                     model: overlay.shortcuts
-                    delegate: Text {
+                    delegate: Label {
                         required property var modelData
                         required property int index
                         Layout.row: index

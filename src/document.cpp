@@ -160,8 +160,11 @@ QString Document::problem() const {
     return QString::fromLatin1(QMetaEnum::fromType<Problem>().valueToKey(int(m_problem)));
 }
 
-void Document::attach(QQuickTextDocument *document) {
-    if (document)
+void Document::attach(QQuickItem *textEdit) {
+    if (!textEdit)
+        return;
+    m_textEdit = textEdit;
+    if (auto *document = textEdit->property("textDocument").value<QQuickTextDocument *>())
         attachDocument(document->textDocument());
 }
 
@@ -208,13 +211,18 @@ bool Document::load(const QString &path, bool replaceUndoably) {
     if (!m_document)
         return false;
     m_locked = false;
+    // The language is set before the text, so the new text is colored once,
+    // as it arrives.
     auto setText = [&](const QString &text) {
+        setLanguageFor(path, text.left(text.indexOf(QChar(u'\n'))), false);
         if (replaceUndoably) {
             QTextCursor cursor(m_document);
             cursor.beginEditBlock();
             cursor.select(QTextCursor::Document);
             cursor.insertText(text);
             cursor.endEditBlock();
+        } else if (m_textEdit) {
+            m_textEdit->setProperty("text", text);
         } else {
             m_document->setPlainText(text);
         }
@@ -225,7 +233,6 @@ bool Document::load(const QString &path, bool replaceUndoably) {
         m_target.clear();
         m_diskHash.clear();
         setText({});
-        setLanguageFor(path, {});
         setProblem(problem, displayPath());
         watch();
         emit fileChanged();
@@ -242,11 +249,12 @@ bool Document::load(const QString &path, bool replaceUndoably) {
         m_target = target;
         m_diskHash.clear();
         m_bom = m_crlf = false;
-        m_editable = true;
         setText({});
-        setLanguageFor(path, {});
         m_indentUnit = Highlighter::defaultIndent(m_language);
-        setProblem(Problem::None);
+        // A new file in a folder the user can't write opens read-only too.
+        m_locked = ::access(QFile::encodeName(QFileInfo(target).absolutePath()).constData(), W_OK) != 0;
+        m_editable = !m_locked;
+        setProblem(m_locked ? Problem::NotWritable : Problem::None, displayPath());
         watch();
         emit fileChanged();
         return true;
@@ -271,7 +279,6 @@ bool Document::load(const QString &path, bool replaceUndoably) {
     m_crlf = decoded.crlf;
     m_editable = true;
     setText(decoded.text);
-    setLanguageFor(path, decoded.text.left(decoded.text.indexOf('\n')));
     m_indentUnit = decoded.indentUnit.isEmpty() ? Highlighter::defaultIndent(m_language) : decoded.indentUnit;
     // A file the user can't write opens read-only, saying so, rather than
     // letting them type changes the save will refuse.
@@ -289,10 +296,10 @@ bool Document::load(const QString &path, bool replaceUndoably) {
     return true;
 }
 
-void Document::setLanguageFor(const QString &path, const QString &firstLine) {
+void Document::setLanguageFor(const QString &path, const QString &firstLine, bool recolor) {
     m_language = Highlighter::languageFor(path, firstLine);
     if (m_highlighter)
-        m_highlighter->setLanguage(m_language);
+        m_highlighter->setLanguage(m_language, recolor);
 }
 
 // Where a save would go right now: the link's current target, or the path.

@@ -25,7 +25,6 @@ Button {
         color: control.primary ? theme.accentForeground : theme.foreground
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        font.pixelSize: theme.textSize
     }
 
     background: Rectangle {

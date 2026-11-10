@@ -47,7 +47,6 @@ int main(int argc, char *argv[]) {
     // so asking for "monospace" follows the user's choice.
     QFont font("monospace");
     font.setStyleHint(QFont::Monospace);
-    font.setPixelSize(13);
     app.setFont(font);
     QQuickStyle::setStyle("Material");
 

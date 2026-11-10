@@ -27,7 +27,6 @@ const QHash<QString, QColor> &fallbackColors() {
         {"yellow", QColor("#e0af68")},
         {"blue", QColor("#7aa2f7")},
         {"magenta", QColor("#bb9af7")},
-        {"cyan", QColor("#7dcfff")},
         {"orange", QColor("#ff9e64")},
     };
     return colors;

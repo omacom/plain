@@ -11,7 +11,7 @@ Item {
     property bool wrap: false
     readonly property alias textDocument: area.textDocument
     readonly property alias area: area
-    readonly property int cursorPosition: area.cursorPosition
+    readonly property int currentLine: editing.lineOf(area.cursorPosition)
 
     // The first and last line numbers on screen, so the gutter draws only
     // those however long the file is.
@@ -64,15 +64,14 @@ Item {
             delegate: Text {
                 required property int index
                 readonly property int line: view.firstLine + index
-                readonly property int current: editing.lineOf(area.cursorPosition)
                 // Re-read when anything moves the lines.
                 y: { flick.contentY; area.contentHeight; area.width; return area.positionToRectangle(editing.positionOfLine(line)).y - flick.contentY }
                 anchors.right: parent.right
                 anchors.rightMargin: 14
                 text: line
                 font: area.font
-                color: line === current ? theme.foreground : theme.secondaryForeground
-                opacity: line === current ? 1 : 0.6
+                color: line === view.currentLine ? theme.foreground : theme.secondaryForeground
+                opacity: line === view.currentLine ? 1 : 0.6
             }
         }
     }
@@ -143,11 +142,12 @@ Item {
                     area.cursorPosition = editing.newline(area.selectionStart, area.selectionEnd)
                     event.accepted = true
                 } else if (event.key === Qt.Key_Tab && plain) {
-                    if (area.selectionStart !== area.selectionEnd
-                            && editing.lineOf(area.selectionStart) !== editing.lineOf(area.selectionEnd))
+                    // Across lines Tab indents them; within one it types the
+                    // indentation over any selection, like any other key.
+                    if (editing.lineOf(area.selectionStart) !== editing.lineOf(area.selectionEnd))
                         editing.indent(area.selectionStart, area.selectionEnd)
                     else
-                        area.insert(area.cursorPosition, doc.indentUnit)
+                        area.cursorPosition = editing.replace(area.selectionStart, area.selectionEnd, doc.indentUnit)
                     event.accepted = true
                 } else if (event.key === Qt.Key_Backtab) {
                     editing.outdent(area.selectionStart, area.selectionEnd)

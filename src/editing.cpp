@@ -101,16 +101,11 @@ void Editing::indent(int start, int end) {
     const QString unit = m_document->indentUnit();
     QTextCursor cursor(doc);
     cursor.beginEditBlock();
-    if (start == end) {
-        cursor.setPosition(start);
+    for (const QTextBlock &block : touchedBlocks(doc, start, end)) {
+        if (block.text().trimmed().isEmpty())
+            continue;
+        cursor.setPosition(block.position());
         cursor.insertText(unit);
-    } else {
-        for (const QTextBlock &block : touchedBlocks(doc, start, end)) {
-            if (block.text().trimmed().isEmpty())
-                continue;
-            cursor.setPosition(block.position());
-            cursor.insertText(unit);
-        }
     }
     cursor.endEditBlock();
 }
@@ -227,11 +222,6 @@ int Editing::lineCount() const {
 int Editing::lineOf(int position) const {
     QTextDocument *doc = document();
     return doc ? doc->findBlock(position).blockNumber() + 1 : 1;
-}
-
-int Editing::columnOf(int position) const {
-    QTextDocument *doc = document();
-    return doc ? position - doc->findBlock(position).position() + 1 : 1;
 }
 
 int Editing::positionOfLine(int line) const {

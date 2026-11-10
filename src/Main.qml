@@ -116,7 +116,7 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
-        doc.attach(editor.textDocument)
+        doc.attach(editor.area)
         if (startPath.length > 0)
             doc.open(startPath)
         editor.goToLine(Math.max(1, startLine))
@@ -139,7 +139,7 @@ ApplicationWindow {
                 onDone: editor.focusText()
             }
 
-            Text {
+            Label {
                 id: pickerError
                 Layout.fillWidth: true
                 Layout.margins: 10
@@ -147,6 +147,12 @@ ApplicationWindow {
                 color: theme.red
                 wrapMode: Text.Wrap
                 MouseArea { anchors.fill: parent; onClicked: pickerError.text = "" }
+            }
+
+            FindBar {
+                id: findBar
+                Layout.fillWidth: true
+                editor: editor
             }
 
             EditorView {
@@ -158,12 +164,6 @@ ApplicationWindow {
                 wrap: settings.wrap
                 LayoutMirroring.enabled: false
                 LayoutMirroring.childrenInherit: true
-            }
-
-            FindBar {
-                id: findBar
-                Layout.fillWidth: true
-                editor: editor
             }
 
             Footer {
@@ -184,7 +184,6 @@ ApplicationWindow {
     GoToLine {
         id: goToLine
         anchors.centerIn: parent
-        lines: editing.lineCount()
         onAccepted: function(line) { editor.goToLine(line) }
         onClosed: editor.focusText()
     }
@@ -242,7 +241,6 @@ ApplicationWindow {
                     : qsTr("Save changes to %1 before closing?").arg(doc.fileName)
                 color: theme.foreground
                 wrapMode: Text.Wrap
-                font.pixelSize: theme.textSize
             }
             RowLayout {
                 Layout.alignment: Qt.AlignRight

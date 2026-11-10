@@ -19,9 +19,15 @@ class Highlighter : public QObject {
 public:
     enum Token { Comment, String, Number, Key, Keyword, Constant, TokenCount };
 
+    // Lines longer than this stay uncolored. Qt lays out a line's color ranges
+    // in quadratic time: measured on Qt 6.12, a keystroke in a colored line of
+    // 2,000 characters costs 10 ms, of 9,000 characters 140 ms. Config lines
+    // are far shorter; a minified file's one line just shows as plain text.
+    static constexpr int LongLine = 2000;
+
     Highlighter(QTextDocument *document, Theme *theme);
 
-    void setLanguage(const QString &language);
+    void setLanguage(const QString &language, bool recolor = true);
     QString language() const { return m_language; }
     void rehighlight();
 

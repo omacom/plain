@@ -12,7 +12,8 @@ Rectangle {
     property bool caseSensitive: false
     // "Replaced 3", until the search changes.
     property string replaced: ""
-    readonly property int matches: { doc.modified; findField.text; bar.caseSensitive; return visible ? editing.matchCount(findField.text, caseSensitive) : 0 }
+    // Recounted as the text changes, so the count stays true while editing.
+    readonly property int matches: { editor.area.length; return visible ? editing.matchCount(findField.text, caseSensitive) : 0 }
 
     visible: false
     implicitHeight: column.implicitHeight + 12

@@ -4,25 +4,22 @@
 #include <QFileSystemWatcher>
 #include <QObject>
 #include <QPointer>
+#include <QQuickItem>
 #include <QTextDocument>
 #include <QTimer>
 
 #include "theme.h"
 
-class QQuickTextDocument;
 class Highlighter;
 
 // The file behind the editor: loading it, saving it without damage, and
 // noticing when it changes underneath. The QTextDocument belongs to the QML
-// TextEdit and is the one source of truth for the text; Document reads and
-// writes it but never rebinds the TextEdit's text property.
+// TextEdit and is the one source of truth for the text.
 class Document : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString path READ path NOTIFY fileChanged)
     Q_PROPERTY(QString displayPath READ displayPath NOTIFY fileChanged)
     Q_PROPERTY(QString fileName READ fileName NOTIFY fileChanged)
-    Q_PROPERTY(QString language READ language NOTIFY fileChanged)
-    Q_PROPERTY(QString commentPrefix READ commentPrefix NOTIFY fileChanged)
     Q_PROPERTY(QString lineEnding READ lineEnding NOTIFY fileChanged)
     Q_PROPERTY(QString indentUnit READ indentUnit NOTIFY fileChanged)
     Q_PROPERTY(bool modified READ modified NOTIFY modifiedChanged)
@@ -84,10 +81,13 @@ public:
     bool locked() const { return m_locked; }
     QString problem() const;
     QString problemDetail() const { return m_problemDetail; }
-    Problem problemCode() const { return m_problem; }
 
-    // Hands over the TextEdit's document; everything else needs it first.
-    Q_INVOKABLE void attach(QQuickTextDocument *document);
+    // Hands over the TextEdit; everything else needs it first. Files load
+    // through its text property, which is where Qt Quick turns on drawing only
+    // the visible lines of a long text: loaded behind its back, every
+    // keystroke in a 10,000-line file redrew all of it (57 ms instead of 1).
+    Q_INVOKABLE void attach(QQuickItem *textEdit);
+    // Tests without a TextEdit hand over a bare document.
     void attachDocument(QTextDocument *document);
     QTextDocument *textDocument() const { return m_document; }
 
@@ -127,8 +127,9 @@ private:
     void setProblem(Problem problem, const QString &detail = {});
     void watch();
     void diskChanged();
-    void setLanguageFor(const QString &path, const QString &text);
+    void setLanguageFor(const QString &path, const QString &firstLine, bool recolor = true);
 
+    QPointer<QQuickItem> m_textEdit;
     QPointer<QTextDocument> m_document;
     QPointer<Theme> m_theme;
     Highlighter *m_highlighter = nullptr;

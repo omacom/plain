@@ -7,6 +7,8 @@
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTextCursor>
+#include <QTextBlock>
+#include <QTextLayout>
 #include <QTextDocument>
 #include <QtTest>
 
@@ -326,6 +328,37 @@ private slots:
         append(&text, "b\n");
         QVERIFY(!doc.save());
         QCOMPARE(doc.problem(), QString("NotWritable"));
+
+        // A new file in a folder the user can't write opens locked, too.
+        QDir(dir.path()).mkdir("sealed");
+        QFile::setPermissions(dir.filePath("sealed"), QFile::ReadOwner | QFile::ExeOwner);
+        QVERIFY(doc.open(dir.filePath("sealed/new.conf")));
+        QVERIFY(doc.locked());
+        QVERIFY(!doc.editable());
+        QCOMPARE(doc.problem(), QString("NotWritable"));
+        QFile::setPermissions(dir.filePath("sealed"), QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
+    }
+
+    // Qt Quick draws only the visible lines of a long text, but turns that on
+    // only when the text arrives through the TextEdit itself. Loaded behind
+    // its back, every keystroke in a 10,000-line file redrew it all.
+    void longFilesDrawOnlyWhatsVisible()
+    {
+        QQmlEngine engine;
+        QQmlComponent component(&engine);
+        component.setData("import QtQuick\nTextEdit { textFormat: TextEdit.PlainText }", {});
+        std::unique_ptr<QQuickItem> edit(qobject_cast<QQuickItem *>(component.create()));
+        QVERIFY(edit);
+
+        QTemporaryDir dir;
+        QByteArray lines;
+        for (int i = 0; i < 2000; ++i)
+            lines += "key_" + QByteArray::number(i) + " = value\n";
+        write(dir.filePath("long.conf"), lines);
+        Document doc;
+        doc.attach(edit.get());
+        QVERIFY(doc.open(dir.filePath("long.conf")));
+        QVERIFY(edit->flags() & QQuickItem::ItemObservesViewport);
     }
 
     void createsNewFiles()
@@ -428,6 +461,20 @@ private slots:
                  QString("wwwwww.kkkkkk.sssss"));
     }
 
+    void leavesVeryLongLinesUncolored()
+    {
+        // A document reports its changes only once it has a layout, which the
+        // TextEdit's always does.
+        QTextDocument document;
+        document.documentLayout();
+        Highlighter highlighter(&document, nullptr);
+        highlighter.setLanguage("jsonc");
+        const QString longLine = "\"k\": " + QString(Highlighter::LongLine, '1');
+        document.setPlainText(longLine + "\n\"k\": 1");
+        QVERIFY(document.firstBlock().layout()->formats().isEmpty());
+        QVERIFY(!document.lastBlock().layout()->formats().isEmpty());
+    }
+
     void highlightsDataFormats()
     {
         QCOMPARE(Highlighter::tokens("jsonc", {"{\"a\": \"b\", // c"}),
@@ -451,13 +498,12 @@ private slots:
         component.setData("import QtQuick\nTextEdit { textFormat: TextEdit.PlainText }", {});
         std::unique_ptr<QQuickItem> edit(qobject_cast<QQuickItem *>(component.create()));
         QVERIFY(edit);
-        auto *quickDocument = edit->property("textDocument").value<QQuickTextDocument *>();
 
         QTemporaryDir dir;
         const QString path = dir.filePath("t.lua");
         write(path, "a = 1\n    b = 2\n");
         Document doc;
-        doc.attach(quickDocument);
+        doc.attach(edit.get());
         Editing editing(&doc);
         QVERIFY(doc.open(path));
         auto text = [&] { return edit->property("text").toString(); };

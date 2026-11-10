@@ -7,6 +7,7 @@
 #include <QTextBlock>
 #include <QTextDocument>
 #include <QTextLayout>
+#include <cctype>
 #include <functional>
 
 namespace {
@@ -156,24 +157,29 @@ int scan(const Spec &s, const QString &text, int state, const Emit &emitToken) {
     if (state >= LuaLongString && !closeLong(luaClose(state - LuaLongString), Highlighter::String))
         return state;
 
-    // A [section] line, or a whole line that is a comment in INI style.
-    const QString trimmed = text.trimmed();
-    if (s.sections && trimmed.startsWith('[') && trimmed.endsWith(']') && i == 0) {
-        emitToken(text.indexOf('['), trimmed.size(), Highlighter::Keyword);
-        return Normal;
-    }
-
+    // Views, not copies: the scan looks at every character, and copying the
+    // rest of the line at each one made a long line quadratic.
+    const QStringView line(text);
     auto nextNonSpace = [&](qsizetype from) {
         while (from < n && text.at(from).isSpace())
             ++from;
         return from;
     };
-    auto atLineStart = [&](qsizetype at) {
-        for (qsizetype k = 0; k < at; ++k)
-            if (!text.at(k).isSpace() && text.at(k) != '-' && text.at(k) != '{' && text.at(k) != ',')
-                return false;
-        return true;
-    };
+    // Where the line's opening run of spaces (and, for keys, list dashes and
+    // table openers) ends, worked out once per line.
+    const qsizetype indent = nextNonSpace(0);
+    qsizetype keyStart = 0;
+    while (keyStart < n && (text.at(keyStart).isSpace() || QStringView(u"-{,").contains(text.at(keyStart))))
+        ++keyStart;
+
+    // A [section] line.
+    if (s.sections && i == 0) {
+        const QStringView trimmed = line.trimmed();
+        if (trimmed.startsWith(u'[') && trimmed.endsWith(u']')) {
+            emitToken(indent, trimmed.size(), Highlighter::Keyword);
+            return Normal;
+        }
+    }
 
     while (i < n) {
         const QChar c = text.at(i);
@@ -181,9 +187,10 @@ int scan(const Spec &s, const QString &text, int state, const Emit &emitToken) {
             ++i;
             continue;
         }
+        const QStringView rest = line.sliced(i);
 
         // Comments.
-        if (s.luaLongBrackets && text.mid(i, 2) == "--") {
+        if (s.luaLongBrackets && rest.startsWith(u"--")) {
             const int level = longBracketLevel(text, i + 2);
             if (level >= 0) {
                 const qsizetype start = i;
@@ -200,22 +207,17 @@ int scan(const Spec &s, const QString &text, int state, const Emit &emitToken) {
             }
         }
         bool comment = false;
-        for (const QString &marker : s.lineComments) {
-            if (!text.mid(i).startsWith(marker))
-                continue;
-            if (s.commentNeedsSpace && i > 0 && !text.at(i - 1).isSpace())
-                continue;
-            comment = true;
-            break;
-        }
+        for (const QString &marker : s.lineComments)
+            if (rest.startsWith(marker) && (!s.commentNeedsSpace || i == 0 || text.at(i - 1).isSpace()))
+                comment = true;
         for (const QString &marker : s.lineStartComments)
-            if (text.mid(i).startsWith(marker) && text.left(i).trimmed().isEmpty())
+            if (i == indent && rest.startsWith(marker))
                 comment = true;
         if (comment) {
             emitToken(i, n - i, Highlighter::Comment);
             return Normal;
         }
-        if (!s.blockOpen.isEmpty() && text.mid(i).startsWith(s.blockOpen)) {
+        if (!s.blockOpen.isEmpty() && rest.startsWith(s.blockOpen)) {
             const qsizetype end = text.indexOf(s.blockClose, i + s.blockOpen.size());
             if (end < 0) {
                 emitToken(i, n - i, Highlighter::Comment);
@@ -241,8 +243,8 @@ int scan(const Spec &s, const QString &text, int state, const Emit &emitToken) {
                 continue;
             }
         }
-        if (s.tripleQuotes && (text.mid(i, 3) == "\"\"\"" || text.mid(i, 3) == "'''")) {
-            const QString quote = text.mid(i, 3);
+        if (s.tripleQuotes && (rest.startsWith(u"\"\"\"") || rest.startsWith(u"'''"))) {
+            const QString quote = rest.first(3).toString();
             const qsizetype end = text.indexOf(quote, i + 3);
             if (end < 0) {
                 emitToken(i, n - i, Highlighter::String);
@@ -290,7 +292,7 @@ int scan(const Spec &s, const QString &text, int state, const Emit &emitToken) {
         }
         if (s.hexColors && c == '#') {
             qsizetype j = i + 1;
-            while (j < n && QStringLiteral("0123456789abcdefABCDEF").contains(text.at(j)))
+            while (j < n && isxdigit(text.at(j).toLatin1()))
                 ++j;
             if (j - i == 4 || j - i == 7 || j - i == 9) {
                 emitToken(i, j - i, Highlighter::Number);
@@ -325,9 +327,9 @@ int scan(const Spec &s, const QString &text, int state, const Emit &emitToken) {
                 emitToken(i, j - i, Highlighter::Constant);
             else if (s.sections && next == '{')
                 emitToken(i, j - i, Highlighter::Keyword);
-            else if ((s.keysBeforeEquals && equalsFollows && (atLineStart(i) || !s.sections))
+            else if ((s.keysBeforeEquals && equalsFollows && (i <= keyStart || !s.sections))
                      || (s.keysBeforeColon && next == ':' && (after + 1 >= n || text.at(after + 1).isSpace())
-                         && atLineStart(i)))
+                         && i <= keyStart))
                 emitToken(i, j - i, Highlighter::Key);
             i = j;
             continue;
@@ -341,8 +343,9 @@ int scan(const Spec &s, const QString &text, int state, const Emit &emitToken) {
 Highlighter::Highlighter(QTextDocument *document, Theme *theme)
     : QObject(document), m_document(document), m_theme(theme) {
     updateFormats();
+    // Plain text has no colors, so typing in it costs nothing here.
     connect(document, &QTextDocument::contentsChange, this, [this](int from, int, int added) {
-        if (!m_marking)
+        if (!m_marking && m_language != "text")
             highlight(from, from + added);
     });
     if (theme)
@@ -352,11 +355,14 @@ Highlighter::Highlighter(QTextDocument *document, Theme *theme)
         });
 }
 
-void Highlighter::setLanguage(const QString &language) {
+// Without recolor, the caller is about to replace the text, which colors it
+// as it arrives; recoloring the old text first would be wasted.
+void Highlighter::setLanguage(const QString &language, bool recolor) {
     if (language == m_language)
         return;
     m_language = language;
-    rehighlight();
+    if (recolor)
+        rehighlight();
 }
 
 void Highlighter::rehighlight() {
@@ -381,9 +387,10 @@ void Highlighter::highlight(int from, int to) {
     for (; block.isValid(); block = block.next()) {
         const bool inRange = block.position() <= to;
         QList<QTextLayout::FormatRange> ranges;
-        int next = 0;
-        if (!none)
-            next = scan(language, block.text(), state, [&](qsizetype at, qsizetype length, Token token) {
+        int next = none ? 0 : state;
+        const QString text = block.text();
+        if (!none && text.size() <= LongLine)
+            next = scan(language, text, state, [&](qsizetype at, qsizetype length, Token token) {
                 ranges.append({int(at), int(length), m_formats[token]});
             });
         const int previousNext = block.userState();

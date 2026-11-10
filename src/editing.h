@@ -18,6 +18,7 @@ public:
     // Comments the lines the selection touches, or uncomments them when all
     // of them already are. Uses the language's own comment marker.
     Q_INVOKABLE void toggleComment(int start, int end);
+    // Indents and outdents every non-empty line the selection touches.
     Q_INVOKABLE void indent(int start, int end);
     Q_INVOKABLE void outdent(int start, int end);
     // Replaces the selection with a line break and the current line's
@@ -33,7 +34,6 @@ public:
 
     Q_INVOKABLE int lineCount() const;
     Q_INVOKABLE int lineOf(int position) const;   // 1-based
-    Q_INVOKABLE int columnOf(int position) const; // 1-based, a tab counts as one
     Q_INVOKABLE int positionOfLine(int line) const;
 
 private:
