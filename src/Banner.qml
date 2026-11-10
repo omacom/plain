@@ -34,6 +34,7 @@ Rectangle {
         case "NotWritable": return qsTr("You don't have permission to change %1. To edit it as administrator, run sudoedit in a terminal.").arg(detail)
         case "NeedsInPlace": return qsTr("Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.").arg(detail)
         case "SaveFailed": return qsTr("Couldn't save: %1").arg(detail)
+        case "ModeLost": return qsTr("Saved %1, but couldn't restore its special permission bits.").arg(detail)
         }
         return ""
     }

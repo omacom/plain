@@ -12,8 +12,18 @@ Rectangle {
     property bool caseSensitive: false
     // "Replaced 3", until the search changes.
     property string replaced: ""
-    // Recounted as the text changes, so the count stays true while editing.
-    readonly property int matches: { editor.area.length; return visible ? editing.matchCount(findField.text, caseSensitive) : 0 }
+    property int matches: 0
+
+    // Counted when the search changes, and a moment after the text stops
+    // changing rather than on every keystroke, since it searches the whole file.
+    function recount() { matches = visible ? editing.matchCount(findField.text, caseSensitive) : 0 }
+    onVisibleChanged: recount()
+    onCaseSensitiveChanged: recount()
+    Timer { id: recountLater; interval: 150; onTriggered: bar.recount() }
+    Connections {
+        target: bar.editor.area
+        function onTextChanged() { if (bar.visible) recountLater.restart() }
+    }
 
     visible: false
     implicitHeight: column.implicitHeight + 12
@@ -27,6 +37,7 @@ Rectangle {
             findField.text = area.selectedText
         findField.forceActiveFocus()
         findField.selectAll()
+        recount()
     }
 
     function hide() {
@@ -79,6 +90,7 @@ Rectangle {
                 placeholder: qsTr("Find")
                 onTextEdited: {
                     bar.replaced = ""
+                    bar.recount()
                     // Find as you type, from where the current match starts.
                     const found = editing.find(text, editor.area.selectionStart, false, bar.caseSensitive)
                     if (found.length === 2)

@@ -8,7 +8,6 @@ HEADERS += \
     src/arguments.h \
     src/document.h \
     src/editing.h \
-    src/filepicker.h \
     src/highlighter.h \
     src/portalfilepicker.h \
     src/theme.h \

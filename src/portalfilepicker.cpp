@@ -24,8 +24,6 @@ QByteArray portalPathBytes(const QString &path) {
 }
 }
 
-PortalFilePicker::PortalFilePicker(QObject *parent) : FilePicker(parent) {}
-
 void PortalFilePicker::openFile(const QString &folder) {
     QVariantMap options;
     options.insert(QStringLiteral("accept_label"), tr("Open"));
@@ -139,12 +137,11 @@ void PortalFilePicker::requestFile(const QString &method, const QString &title,
 void PortalFilePicker::handleResponse(uint response, const QVariantMap &results) {
     const Action action = m_pendingAction;
     clearPending();
-    if (response != 0)
-        return;
-
     const QStringList uris = results.value(QStringLiteral("uris")).toStringList();
-    if (uris.isEmpty())
+    if (response != 0 || uris.isEmpty()) {
+        emit cancelled();
         return;
+    }
 
     const QUrl url(uris.first());
     if (action == Action::Open)

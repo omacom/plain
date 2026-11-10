@@ -41,13 +41,23 @@ ApplicationWindow {
 
     readonly property int textSize: Math.max(8, Math.min(48, theme.textSize + settings.zoom))
 
+    // An untitled file is named in the save dialog first, and finishes in
+    // onSaveSelected or onCancelled.
     function save() {
         Qt.inputMethod.commit()
-        if (doc.path.length === 0) {
+        if (doc.path.length === 0)
             picker.saveFile("")
-            return false
-        }
-        return doc.save()
+        else
+            afterSave(doc.save())
+    }
+
+    // A save asked for while closing or opening another file goes on to do
+    // that once it succeeds. Whatever happened, nothing waits on it after.
+    function afterSave(saved) {
+        const action = pendingAction
+        pendingAction = ""
+        if (saved && action.length > 0)
+            finish(action)
     }
 
     function saveAs() {
@@ -108,11 +118,12 @@ ApplicationWindow {
             doc.openUrl(url)
             editor.goToLine(1)
         }
-        function onSaveSelected(url) {
-            if (doc.saveAsUrl(url) && win.pendingAction === "close")
-                win.finish("close")
+        function onSaveSelected(url) { win.afterSave(doc.saveAsUrl(url)) }
+        function onCancelled() { win.afterSave(false) }
+        function onFailed(message) {
+            pickerError.text = message
+            win.afterSave(false)
         }
-        function onFailed(message) { pickerError.text = message }
     }
 
     Component.onCompleted: {
@@ -207,10 +218,8 @@ ApplicationWindow {
             close()
             choosing = false
             if (choice === "save") {
-                // An untitled file finishes in onSaveSelected; a failed
-                // save leaves the banner up and the window open.
-                if (win.save())
-                    win.finish(win.pendingAction)
+                // A failed save leaves the banner up and the window open.
+                win.save()
             } else if (choice === "discard") {
                 win.discardConfirmed = win.pendingAction === "close"
                 win.finish(win.pendingAction)

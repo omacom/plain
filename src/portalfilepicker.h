@@ -1,21 +1,29 @@
 #pragma once
 
+#include <QObject>
+#include <QUrl>
 #include <QVariantMap>
-
-#include "filepicker.h"
 
 class QDBusPendingCallWatcher;
 
 // The open and save dialogs through xdg-desktop-portal's FileChooser, so they
 // are the desktop's own. From Omacut (MIT, David Heinemeier Hansson).
-class PortalFilePicker : public FilePicker {
+class PortalFilePicker : public QObject {
     Q_OBJECT
 
 public:
-    explicit PortalFilePicker(QObject *parent = nullptr);
+    explicit PortalFilePicker(QObject *parent = nullptr) : QObject(parent) {}
 
-    void openFile(const QString &folder) override;
-    void saveFile(const QString &suggestedPath) override;
+    // Invokable, since QML's Ctrl+O and Ctrl+S call them.
+    Q_INVOKABLE void openFile(const QString &folder);
+    Q_INVOKABLE void saveFile(const QString &suggestedPath);
+
+signals:
+    void openSelected(const QUrl &url);
+    void saveSelected(const QUrl &url);
+    // The dialog was dismissed without choosing a file.
+    void cancelled();
+    void failed(const QString &message);
 
 private slots:
     void handleResponse(uint response, const QVariantMap &results);

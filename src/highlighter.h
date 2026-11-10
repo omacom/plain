@@ -28,7 +28,6 @@ public:
     Highlighter(QTextDocument *document, Theme *theme);
 
     void setLanguage(const QString &language, bool recolor = true);
-    QString language() const { return m_language; }
     void rehighlight();
 
     // By file name, then extension, then a shebang on the first line.
@@ -44,7 +43,7 @@ public:
 
 private:
     void highlight(int from, int to);
-    void updateFormats();
+    bool updateFormats();
 
     QTextDocument *m_document;
     QPointer<Theme> m_theme;

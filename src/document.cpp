@@ -11,11 +11,13 @@
 #include <QQuickTextDocument>
 #include <QSaveFile>
 #include <QStringDecoder>
+#include <QStringTokenizer>
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QUrl>
 
+#include <grp.h>
 #include <pwd.h>
 #include <sys/stat.h>
 #include <sys/xattr.h>
@@ -32,9 +34,18 @@ bool readFile(const QString &path, QByteArray *bytes) {
     return file.error() == QFile::NoError;
 }
 
+bool writable(const QString &path) {
+    return ::access(QFile::encodeName(path).constData(), W_OK) == 0;
+}
+
 QString ownerName(uid_t uid) {
     const passwd *entry = getpwuid(uid);
     return entry ? QString::fromLocal8Bit(entry->pw_name) : QString::number(uid);
+}
+
+QString groupName(gid_t gid) {
+    const group *entry = getgrgid(gid);
+    return entry ? QString::fromLocal8Bit(entry->gr_name) : QString::number(gid);
 }
 }
 
@@ -50,8 +61,9 @@ Document::Document(QObject *parent) : QObject(parent) {
 }
 
 // Bytes to editable text, or not ok when saving the text again couldn't give
-// back the same file: invalid UTF-8, NUL bytes, carriage returns that aren't
-// part of CRLF, or U+2029, which QTextDocument turns into a line break.
+// back the same file: invalid UTF-8 (a sequence cut off at the end too), NUL
+// bytes, carriage returns that aren't part of CRLF, or U+2029, which
+// QTextDocument turns into a line break.
 Document::Decoded Document::decode(const QByteArray &input) {
     Decoded result;
     QByteArray bytes = input;
@@ -62,8 +74,11 @@ Document::Decoded Document::decode(const QByteArray &input) {
     if (bytes.contains('\0'))
         return result;
 
+    // Stateless, or a sequence cut off at the end of the file is held back as
+    // waiting for more bytes rather than reported, and saving drops it.
     // ConvertInitialBom keeps a second BOM as text instead of eating it.
-    QStringDecoder decoder(QStringConverter::Utf8, QStringConverter::Flag::ConvertInitialBom);
+    QStringDecoder decoder(QStringConverter::Utf8,
+                           QStringConverter::Flag::Stateless | QStringConverter::Flag::ConvertInitialBom);
     QString text = decoder.decode(bytes);
     if (decoder.hasError() || text.contains(QChar::ParagraphSeparator))
         return result;
@@ -84,7 +99,6 @@ Document::Decoded Document::decode(const QByteArray &input) {
     if (crlf > 0)
         text.replace("\r\n", "\n");
     result.text = text;
-    result.indentUnit = detectIndent(text);
     result.ok = true;
     return result;
 }
@@ -108,7 +122,7 @@ QByteArray Document::encode(const QTextDocument *document, bool bom, bool crlf) 
 QString Document::detectIndent(const QString &text) {
     int tabs = 0, spaced = 0, previous = 0;
     QHash<int, int> steps;
-    for (const QStringView line : QStringView(text).split(u'\n')) {
+    for (const QStringView line : qTokenize(text, u'\n')) {
         if (line.trimmed().isEmpty())
             continue;
         if (line.startsWith(u'\t')) {
@@ -135,6 +149,17 @@ QString Document::detectIndent(const QString &text) {
 
 QByteArray Document::hash(const QByteArray &bytes) {
     return QCryptographicHash::hash(bytes, QCryptographicHash::Sha256);
+}
+
+// What identifies a version of a file without reading it: device, inode, size
+// and modification time. Empty when there's no file.
+QByteArray Document::stamp(const QString &path) {
+    struct stat st;
+    if (::stat(QFile::encodeName(path).constData(), &st) != 0)
+        return {};
+    return QByteArray::number(qulonglong(st.st_dev)) + ':' + QByteArray::number(qulonglong(st.st_ino)) + ':'
+         + QByteArray::number(qlonglong(st.st_size)) + ':' + QByteArray::number(qlonglong(st.st_mtim.tv_sec)) + '.'
+         + QByteArray::number(qlonglong(st.st_mtim.tv_nsec));
 }
 
 QString Document::displayPath() const {
@@ -184,12 +209,17 @@ bool Document::open(const QString &path) {
     // Absolute, but not canonical: the user opened the link, not its target.
     m_path = QFileInfo(path).absoluteFilePath();
     m_allowLarge = false;
-    return load(m_path, false);
+    return load(false);
 }
 
 void Document::openAnyway() {
     m_allowLarge = true;
-    load(m_path, false);
+    load(false);
+}
+
+void Document::reload() {
+    if (!m_path.isEmpty())
+        load(true);
 }
 
 bool Document::tooLarge(qint64 size, const QString &text) {
@@ -207,52 +237,61 @@ bool Document::tooLarge(qint64 size, const QString &text) {
     return false;
 }
 
-bool Document::load(const QString &path, bool replaceUndoably) {
+// The text goes in with its language already set, so it is colored once, as
+// it arrives. Opening goes through the TextEdit (see attach()); a reload is
+// one undoable replacement.
+void Document::setText(const QString &text, bool undoably) {
+    setLanguageFor(m_path, text.left(text.indexOf(QChar(u'\n'))), false);
+    if (undoably) {
+        QTextCursor cursor(m_document);
+        cursor.beginEditBlock();
+        cursor.select(QTextCursor::Document);
+        cursor.insertText(text);
+        cursor.endEditBlock();
+    } else if (m_textEdit) {
+        m_textEdit->setProperty("text", text);
+    } else {
+        m_document->setPlainText(text);
+    }
+    m_document->setModified(false);
+}
+
+// Opens m_path into the editor, or with reload, replaces the editor's text
+// with what's on disk now. A reload that can't read a usable file leaves the
+// editor and everything about the file as they were, and says why.
+bool Document::load(bool reload) {
     if (!m_document)
         return false;
-    m_locked = false;
-    // The language is set before the text, so the new text is colored once,
-    // as it arrives.
-    auto setText = [&](const QString &text) {
-        setLanguageFor(path, text.left(text.indexOf(QChar(u'\n'))), false);
-        if (replaceUndoably) {
-            QTextCursor cursor(m_document);
-            cursor.beginEditBlock();
-            cursor.select(QTextCursor::Document);
-            cursor.insertText(text);
-            cursor.endEditBlock();
-        } else if (m_textEdit) {
-            m_textEdit->setProperty("text", text);
-        } else {
-            m_document->setPlainText(text);
-        }
-        m_document->setModified(false);
-    };
     auto refuse = [&](Problem problem) {
-        m_editable = false;
-        m_target.clear();
-        m_diskHash.clear();
-        setText({});
+        if (!reload) {
+            m_editable = false;
+            m_locked = false;
+            m_target.clear();
+            forgetDisk();
+            setText({}, false);
+            watch();
+            emit fileChanged();
+        }
         setProblem(problem, displayPath());
-        watch();
-        emit fileChanged();
         return false;
     };
 
-    const QFileInfo info(path);
+    const QFileInfo info(m_path);
     if (!info.exists()) {
+        if (reload)
+            return refuse(Problem::DeletedOnDisk);
         // A new file, created on first save. A dangling link saves to where
         // it points.
-        const QString target = info.isSymLink() ? info.symLinkTarget() : path;
+        const QString target = info.isSymLink() ? info.symLinkTarget() : m_path;
         if (!QFileInfo(QFileInfo(target).absolutePath()).isDir())
             return refuse(Problem::NotFound);
         m_target = target;
-        m_diskHash.clear();
+        forgetDisk();
         m_bom = m_crlf = false;
-        setText({});
+        setText({}, false);
         m_indentUnit = Highlighter::defaultIndent(m_language);
         // A new file in a folder the user can't write opens read-only too.
-        m_locked = ::access(QFile::encodeName(QFileInfo(target).absolutePath()).constData(), W_OK) != 0;
+        m_locked = !writable(QFileInfo(target).absolutePath());
         m_editable = !m_locked;
         setProblem(m_locked ? Problem::NotWritable : Problem::None, displayPath());
         watch();
@@ -261,9 +300,13 @@ bool Document::load(const QString &path, bool replaceUndoably) {
     }
     if (!info.isFile())
         return refuse(Problem::NotRegular);
+    // Asked before reading, so a huge file isn't read only to be put aside.
+    if (!m_allowLarge && info.size() > LargeFileBytes)
+        return refuse(Problem::TooLarge);
 
+    const QString target = info.canonicalFilePath();
     QByteArray bytes;
-    if (!readFile(info.canonicalFilePath(), &bytes))
+    if (!readFile(target, &bytes))
         return refuse(Problem::NotReadable);
     const Decoded decoded = decode(bytes);
     if (!decoded.ok)
@@ -271,27 +314,26 @@ bool Document::load(const QString &path, bool replaceUndoably) {
     if (!m_allowLarge && tooLarge(bytes.size(), decoded.text))
         return refuse(Problem::TooLarge);
 
-    if (replaceUndoably)
+    if (reload)
         emit aboutToReload();
-    m_target = info.canonicalFilePath();
-    m_diskHash = hash(bytes);
+    m_target = target;
+    rememberDisk(bytes);
     m_bom = decoded.bom;
     m_crlf = decoded.crlf;
-    m_editable = true;
-    setText(decoded.text);
-    m_indentUnit = decoded.indentUnit.isEmpty() ? Highlighter::defaultIndent(m_language) : decoded.indentUnit;
+    setText(decoded.text, reload);
+    const QString indent = detectIndent(decoded.text);
+    m_indentUnit = indent.isEmpty() ? Highlighter::defaultIndent(m_language) : indent;
     // A file the user can't write opens read-only, saying so, rather than
     // letting them type changes the save will refuse.
-    if (::access(QFile::encodeName(m_target).constData(), W_OK) != 0) {
-        m_editable = false;
-        m_locked = true;
+    m_locked = !writable(m_target);
+    m_editable = !m_locked;
+    if (m_locked)
         setProblem(Problem::NotWritable, displayPath());
-    } else {
+    else
         setProblem(decoded.mixed ? Problem::MixedEndings : Problem::None);
-    }
     watch();
     emit fileChanged();
-    if (replaceUndoably)
+    if (reload)
         emit reloaded();
     return true;
 }
@@ -300,6 +342,26 @@ void Document::setLanguageFor(const QString &path, const QString &firstLine, boo
     m_language = Highlighter::languageFor(path, firstLine);
     if (m_highlighter)
         m_highlighter->setLanguage(m_language, recolor);
+}
+
+// The version on disk the user has seen: what Plain last read or wrote.
+void Document::rememberDisk(const QByteArray &bytes) {
+    m_diskHash = hash(bytes);
+    m_diskStamp = stamp(m_target);
+}
+
+void Document::forgetDisk() {
+    m_diskHash.clear();
+    m_diskStamp.clear();
+}
+
+// Accepts what's on disk at the target now (or its absence) as seen.
+void Document::acknowledgeDisk() {
+    QByteArray bytes;
+    if (QFileInfo::exists(m_target) && readFile(m_target, &bytes))
+        rememberDisk(bytes);
+    else
+        forgetDisk();
 }
 
 // Where a save would go right now: the link's current target, or the path.
@@ -311,6 +373,17 @@ QString Document::currentTarget() const {
 }
 
 bool Document::save() {
+    return checkAndWrite(false);
+}
+
+bool Document::overwriteInPlace() {
+    return checkAndWrite(true);
+}
+
+// Never save over a version of the file the user hasn't seen, however the
+// save was asked for. The watcher usually says so earlier; this check is the
+// one that counts.
+bool Document::checkAndWrite(bool inPlace) {
     if (m_path.isEmpty() || !m_editable || !m_document)
         return false;
 
@@ -319,87 +392,98 @@ bool Document::save() {
         setProblem(Problem::Retargeted, target);
         return false;
     }
-
-    // Never save over a version of the file the user hasn't seen. The
-    // watcher usually says so earlier; this check is the one that counts.
-    QByteArray bytes;
     const bool exists = QFileInfo::exists(target);
-    if (m_diskHash.isEmpty() && exists) {
-        setProblem(Problem::Conflict, displayPath());
-        return false;
-    }
-    if (!m_diskHash.isEmpty()) {
+    if (m_diskHash.isEmpty()) {
+        if (exists) {
+            setProblem(Problem::Conflict, displayPath());
+            return false;
+        }
+    } else {
         if (!exists) {
             setProblem(Problem::DeletedOnDisk, displayPath());
             return false;
         }
-        if (readFile(target, &bytes) && hash(bytes) != m_diskHash) {
+        QByteArray bytes;
+        if (!readFile(target, &bytes)) {
+            setProblem(Problem::SaveFailed, tr("%1 can't be read back to check it hasn't changed").arg(displayPath()));
+            return false;
+        }
+        if (hash(bytes) != m_diskHash) {
             setProblem(Problem::Conflict, displayPath());
             return false;
         }
     }
-    return write(false);
+
+    if (!write(target, inPlace)) {
+        if (m_problem == Problem::NotWritable) {
+            m_locked = true;
+            emit fileChanged();
+        }
+        return false;
+    }
+    return true;
 }
 
 // Accepts the file as it is on disk now (or its absence) as the version the
 // user has seen, then saves over it. Also how a retargeted link is accepted.
 bool Document::overwrite() {
     m_target = currentTarget();
-    QByteArray bytes;
-    m_diskHash = QFileInfo::exists(m_target) && readFile(m_target, &bytes) ? hash(bytes) : QByteArray();
+    acknowledgeDisk();
     setProblem(Problem::None);
     return save();
 }
 
-bool Document::overwriteInPlace() {
-    return write(true);
-}
-
 void Document::keepMine() {
-    QByteArray bytes;
-    m_diskHash = QFileInfo::exists(m_target) && readFile(m_target, &bytes) ? hash(bytes) : QByteArray();
+    acknowledgeDisk();
     setProblem(Problem::None);
-}
-
-void Document::reload() {
-    if (!m_path.isEmpty())
-        load(m_path, true);
 }
 
 void Document::dismissProblem() {
     setProblem(Problem::None);
 }
 
+// The portal already asked about replacing an existing file, so Save As
+// replaces it without asking again: in place when a rename would lose
+// something. The window takes on the new file only once it's written.
 bool Document::saveAsUrl(const QUrl &url) {
     if (!url.isLocalFile() || !m_document)
         return false;
-    // The portal already asked about replacing an existing file, so what's
-    // there now is the version the user agreed to replace.
-    m_path = QFileInfo(url.toLocalFile()).absoluteFilePath();
-    m_target = currentTarget();
-    QByteArray bytes;
-    m_diskHash = QFileInfo::exists(m_target) && readFile(m_target, &bytes) ? hash(bytes) : QByteArray();
+    const QString path = QFileInfo(url.toLocalFile()).absoluteFilePath();
+    const QFileInfo info(path);
+    const QString target = info.exists() ? info.canonicalFilePath() : info.isSymLink() ? info.symLinkTarget() : path;
+    const bool inPlace = info.exists() && !unsafeForRename(target).isEmpty();
+    if (!write(target, inPlace))
+        return false;
+    m_path = path;
+    m_target = target;
+    m_diskStamp = stamp(target);
     m_editable = true;
     m_locked = false;
     setLanguageFor(m_path, m_document->firstBlock().text());
+    watch();
     emit fileChanged();
-    return write(false);
+    return true;
 }
 
 // Why replacing the file by rename would lose something, or empty when it's
-// safe. The rename makes a new inode owned by the user with ordinary
-// permission bits, so anything beyond those is a reason to ask.
+// safe. The rename makes a new inode owned by the user, in the user's group
+// (or the folder's, when the folder is setgid), with ordinary permission bits,
+// so anything beyond those is a reason to ask.
 QString Document::unsafeForRename(const QString &target) const {
     const QByteArray path = QFile::encodeName(target);
-    struct stat st;
-    if (::stat(path.constData(), &st) != 0)
+    const QByteArray folder = QFile::encodeName(QFileInfo(target).absolutePath());
+    struct stat st, folderSt;
+    if (::stat(path.constData(), &st) != 0 || ::stat(folder.constData(), &folderSt) != 0)
         return {};
-    if (::access(QFile::encodeName(QFileInfo(target).absolutePath()).constData(), W_OK) != 0)
+    if (::access(folder.constData(), W_OK) != 0)
         return tr("its folder isn't writable");
     if (st.st_nlink > 1)
         return tr("it has other hard links");
     if (st.st_uid != ::geteuid())
         return tr("it belongs to %1").arg(ownerName(st.st_uid));
+    const gid_t newGroup = (folderSt.st_mode & S_ISGID) ? folderSt.st_gid : ::getegid();
+    if (st.st_gid != newGroup)
+        return tr("it belongs to the %1 group").arg(groupName(st.st_gid));
     if (st.st_mode & (S_ISUID | S_ISGID | S_ISVTX))
         return tr("it has special permission bits");
     if (::listxattr(path.constData(), nullptr, 0) > 0)
@@ -407,17 +491,13 @@ QString Document::unsafeForRename(const QString &target) const {
     return {};
 }
 
-bool Document::write(bool inPlace) {
-    if (!m_document || m_target.isEmpty())
+// Writes the editor's text to target and records it as the version on disk.
+// Callers decide whether that's safe; this only refuses what it can't do.
+bool Document::write(const QString &target, bool inPlace) {
+    if (!m_document || target.isEmpty())
         return false;
-    const QString target = m_target;
-    const QByteArray targetPath = QFile::encodeName(target);
     const bool exists = QFileInfo::exists(target);
-
-    if (exists ? ::access(targetPath.constData(), W_OK) != 0
-               : ::access(QFile::encodeName(QFileInfo(target).absolutePath()).constData(), W_OK) != 0) {
-        m_locked = true;
-        emit fileChanged();
+    if (!writable(exists ? target : QFileInfo(target).absolutePath())) {
         setProblem(Problem::NotWritable, target);
         return false;
     }
@@ -430,9 +510,10 @@ bool Document::write(bool inPlace) {
     }
 
     const QByteArray bytes = encode(m_document, m_bom, m_crlf);
+    bool modeRestored = true;
     if (inPlace) {
         struct stat before;
-        const bool known = ::stat(targetPath.constData(), &before) == 0;
+        const bool known = ::stat(QFile::encodeName(target).constData(), &before) == 0;
         QFile file(target);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate) || file.write(bytes) != bytes.size()
             || !file.flush() || ::fsync(file.handle()) != 0) {
@@ -442,7 +523,7 @@ bool Document::write(bool inPlace) {
         // The kernel clears setuid and setgid when a non-root user writes a
         // file; put them back, which the owner is allowed to do.
         if (known)
-            ::fchmod(file.handle(), before.st_mode & 07777);
+            modeRestored = ::fchmod(file.handle(), before.st_mode & 07777) == 0;
     } else {
         QSaveFile file(target);
         file.setDirectWriteFallback(false);
@@ -453,8 +534,9 @@ bool Document::write(bool inPlace) {
     }
 
     m_diskHash = hash(bytes);
+    m_diskStamp = stamp(target);
     m_document->setModified(false);
-    setProblem(Problem::None);
+    setProblem(modeRestored ? Problem::None : Problem::ModeLost, displayPath());
     watch();
     return true;
 }
@@ -482,14 +564,19 @@ void Document::watch() {
             m_watcher.addPath(path);
 }
 
-// News from the disk. Only content counts: a touch or Plain's own save
-// leaves the hash as it was and changes nothing.
+// News from the disk. The folder is watched too, since files are replaced
+// rather than written, so most news is about other files: the stamp, without
+// reading anything, says whether this one changed at all. Then only content
+// counts: a touch leaves the hash as it was and changes nothing.
 void Document::diskChanged() {
     watch();
-    if (m_path.isEmpty() || !m_editable)
+    if (m_path.isEmpty() || m_target.isEmpty())
         return;
     const QString target = currentTarget();
-    if (!QFileInfo::exists(target)) {
+    const QByteArray now = stamp(target);
+    if (target == m_target && now == m_diskStamp)
+        return;
+    if (now.isEmpty()) {
         if (!m_diskHash.isEmpty())
             setProblem(Problem::DeletedOnDisk, displayPath());
         return;
@@ -498,17 +585,13 @@ void Document::diskChanged() {
     if (!readFile(target, &bytes))
         return;
     if (target == m_target && hash(bytes) == m_diskHash) {
+        m_diskStamp = now;
         if (m_problem == Problem::DeletedOnDisk || m_problem == Problem::ChangedOnDisk)
             setProblem(Problem::None);
         return;
     }
-    if (m_diskHash.isEmpty() && !modified() && m_document->isEmpty()) {
-        // A new, untouched file someone else just created: show it.
-        load(m_path, true);
-        return;
-    }
     if (!modified() && target == m_target)
-        load(m_path, true);
+        load(true);
     else
         setProblem(Problem::ChangedOnDisk, displayPath());
 }

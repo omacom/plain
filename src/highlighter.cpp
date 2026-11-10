@@ -348,10 +348,12 @@ Highlighter::Highlighter(QTextDocument *document, Theme *theme)
         if (!m_marking && m_language != "text")
             highlight(from, from + added);
     });
+    // The theme also changes for corner rounding and text size; only new
+    // colors are worth recoloring the file for.
     if (theme)
         connect(theme, &Theme::changed, this, [this] {
-            updateFormats();
-            rehighlight();
+            if (updateFormats())
+                rehighlight();
         });
 }
 
@@ -407,7 +409,7 @@ void Highlighter::highlight(int from, int to) {
     m_marking = false;
 }
 
-void Highlighter::updateFormats() {
+bool Highlighter::updateFormats() {
     const QColor fallback[TokenCount] = {"#808080", "#92a593", "#eb8b54", "#7d82d9", "#c89dc1", "#E9BB4F"};
     QColor colors[TokenCount];
     for (int t = 0; t < TokenCount; ++t)
@@ -420,11 +422,15 @@ void Highlighter::updateFormats() {
         colors[Keyword] = m_theme->magenta();
         colors[Constant] = m_theme->yellow();
     }
+    bool changed = false;
     for (int t = 0; t < TokenCount; ++t) {
-        m_formats[t] = QTextCharFormat();
-        m_formats[t].setForeground(colors[t]);
+        QTextCharFormat format;
+        format.setForeground(colors[t]);
+        format.setFontItalic(t == Comment);
+        changed = changed || format != m_formats[t];
+        m_formats[t] = format;
     }
-    m_formats[Comment].setFontItalic(true);
+    return changed;
 }
 
 QString Highlighter::tokens(const QString &language, const QStringList &lines) {

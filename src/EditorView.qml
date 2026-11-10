@@ -9,7 +9,6 @@ Item {
 
     property int fontSize: 12
     property bool wrap: false
-    readonly property alias textDocument: area.textDocument
     readonly property alias area: area
     readonly property int currentLine: editing.lineOf(area.cursorPosition)
 

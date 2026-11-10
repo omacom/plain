@@ -19,7 +19,7 @@
 #include "arguments.h"
 #include "document.h"
 #include "editing.h"
-#include "filepicker.h"
+#include "portalfilepicker.h"
 #include "highlighter.h"
 #include "theme.h"
 #include "translator.h"
@@ -56,6 +56,9 @@ private slots:
         QVERIFY(!Document::decode("a\rb\n").ok);              // lone CR
         QVERIFY(!Document::decode("a\xE2\x80\xA9" "b").ok);   // U+2029
         QVERIFY(Document::decode("").ok);
+        // A sequence cut off at the end, which a stateful decoder holds back
+        // without an error, so saving would drop it.
+        QVERIFY(!Document::decode("a\xE2\x82").ok);
     }
 
     void keepsTheBom()
@@ -281,6 +284,118 @@ private slots:
         QVERIFY(doc.overwriteInPlace());
         QCOMPARE(read(other), QByteArray("a\nb\n")); // the hard link survived
         QVERIFY(!doc.modified());
+    }
+
+    // Overwriting in place, after the question, still never saves over a
+    // version of the file the user hasn't seen.
+    void overwritingInPlaceChecksTheDiskFirst()
+    {
+        QTemporaryDir dir;
+        const QString path = dir.filePath("linked.conf"), other = dir.filePath("other.conf");
+        write(path, "a\n");
+        QVERIFY(::link(QFile::encodeName(path).constData(), QFile::encodeName(other).constData()) == 0);
+        QTextDocument text;
+        Document doc;
+        doc.attachDocument(&text);
+        QVERIFY(doc.open(path));
+        append(&text, "mine\n");
+        QVERIFY(!doc.save());
+        QCOMPARE(doc.problem(), QString("NeedsInPlace"));
+
+        write(other, "theirs\n");
+        QVERIFY(!doc.overwriteInPlace());
+        QCOMPARE(doc.problem(), QString("Conflict"));
+        QCOMPARE(read(path), QByteArray("theirs\n"));
+    }
+
+    void stopsWhenTheDiskCantBeChecked()
+    {
+        if (::geteuid() == 0)
+            QSKIP("root can read anything");
+        QTemporaryDir dir;
+        const QString path = dir.filePath("a.conf");
+        write(path, "a\n");
+        QTextDocument text;
+        Document doc;
+        doc.attachDocument(&text);
+        QVERIFY(doc.open(path));
+        QFile::setPermissions(path, QFile::WriteOwner);
+        append(&text, "b\n");
+        QVERIFY(!doc.save());
+        QCOMPARE(doc.problem(), QString("SaveFailed"));
+        QFile::setPermissions(path, QFile::ReadOwner | QFile::WriteOwner);
+        QCOMPARE(read(path), QByteArray("a\n"));
+    }
+
+    // A reload that can't use what's on disk keeps the editor as it was.
+    void failedReloadKeepsTheEdits()
+    {
+        QTemporaryDir dir;
+        const QString path = dir.filePath("a.conf");
+        write(path, "a\n");
+        QTextDocument text;
+        Document doc;
+        doc.attachDocument(&text);
+        QVERIFY(doc.open(path));
+        append(&text, "mine\n");
+        write(path, QByteArray("\xFF\xFE", 2));
+        doc.reload();
+        QCOMPARE(doc.problem(), QString("NotText"));
+        QCOMPARE(text.toPlainText(), QString("a\nmine\n"));
+        QVERIFY(doc.modified());
+        QVERIFY(doc.editable());
+
+        QFile::remove(path);
+        doc.reload();
+        QCOMPARE(doc.problem(), QString("DeletedOnDisk"));
+        QCOMPARE(text.toPlainText(), QString("a\nmine\n"));
+    }
+
+    void failedSaveAsKeepsTheFile()
+    {
+        if (::geteuid() == 0)
+            QSKIP("root can write anything");
+        QTemporaryDir dir;
+        const QString path = dir.filePath("a.conf");
+        write(path, "a\n");
+        QDir(dir.path()).mkdir("sealed");
+        QFile::setPermissions(dir.filePath("sealed"), QFile::ReadOwner | QFile::ExeOwner);
+        QTextDocument text;
+        Document doc;
+        doc.attachDocument(&text);
+        QVERIFY(doc.open(path));
+        QVERIFY(!doc.saveAsUrl(QUrl::fromLocalFile(dir.filePath("sealed/b.conf"))));
+        QCOMPARE(doc.path(), path);
+        QFile::setPermissions(dir.filePath("sealed"), QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
+    }
+
+    // A rename would hand the file to the user's own group.
+    void asksBeforeChangingTheGroup()
+    {
+        gid_t groups[64];
+        const int count = ::getgroups(64, groups);
+        gid_t other = ::getegid();
+        for (int i = 0; i < count; ++i)
+            if (groups[i] != ::getegid())
+                other = groups[i];
+        if (other == ::getegid())
+            QSKIP("needs a second group to give the file");
+
+        QTemporaryDir dir;
+        const QString path = dir.filePath("shared.conf");
+        write(path, "a\n");
+        QVERIFY(::chown(QFile::encodeName(path).constData(), -1, other) == 0);
+        QTextDocument text;
+        Document doc;
+        doc.attachDocument(&text);
+        QVERIFY(doc.open(path));
+        append(&text, "b\n");
+        QVERIFY(!doc.save());
+        QCOMPARE(doc.problem(), QString("NeedsInPlace"));
+        QVERIFY(doc.overwriteInPlace());
+        struct stat st;
+        QVERIFY(::stat(QFile::encodeName(path).constData(), &st) == 0);
+        QCOMPARE(st.st_gid, other);
     }
 
     void asksBeforeDroppingSpecialBits()
@@ -550,8 +665,8 @@ private slots:
     // QML calls these from Ctrl+O and Ctrl+S; plain C++ methods it can't.
     void filePickerIsCallableFromQml()
     {
-        QVERIFY(FilePicker::staticMetaObject.indexOfMethod("openFile(QString)") >= 0);
-        QVERIFY(FilePicker::staticMetaObject.indexOfMethod("saveFile(QString)") >= 0);
+        QVERIFY(PortalFilePicker::staticMetaObject.indexOfMethod("openFile(QString)") >= 0);
+        QVERIFY(PortalFilePicker::staticMetaObject.indexOfMethod("saveFile(QString)") >= 0);
     }
 
     // Theme and translator, from the template.

@@ -47,6 +47,7 @@ public:
         NotWritable,     // the user can't write the file: sudoedit is the way
         NeedsInPlace,    // an atomic replace would lose something; ask first
         SaveFailed,      // the write itself failed
+        ModeLost,        // saved in place, but its special permission bits couldn't be restored
     };
     Q_ENUM(Problem)
 
@@ -57,13 +58,13 @@ public:
         bool bom = false;
         bool crlf = false;
         bool mixed = false;
-        QString indentUnit;    // "\t" or N spaces, empty when undetectable
         bool ok = false;
     };
     static Decoded decode(const QByteArray &bytes);
     static QByteArray encode(const QTextDocument *document, bool bom, bool crlf);
     static QString detectIndent(const QString &text);
     static QByteArray hash(const QByteArray &bytes);
+    static QByteArray stamp(const QString &path);
 
     explicit Document(QObject *parent = nullptr);
 
@@ -120,8 +121,13 @@ signals:
     void reloaded();
 
 private:
-    bool load(const QString &path, bool replaceUndoably);
-    bool write(bool inPlace);
+    bool load(bool reload);
+    void setText(const QString &text, bool undoably);
+    bool checkAndWrite(bool inPlace);
+    bool write(const QString &target, bool inPlace);
+    void rememberDisk(const QByteArray &bytes);
+    void forgetDisk();
+    void acknowledgeDisk();
     QString currentTarget() const;
     QString unsafeForRename(const QString &target) const;
     void setProblem(Problem problem, const QString &detail = {});
@@ -137,6 +143,7 @@ private:
     QString m_path;              // what the user opened, as they wrote it (absolute)
     QString m_target;            // the regular file it resolves to, at open
     QByteArray m_diskHash;       // the bytes last read or written; empty: no file yet
+    QByteArray m_diskStamp;      // stamp() of that version, to skip rereading unchanged files
     bool m_bom = false;
     bool m_crlf = false;
     QString m_indentUnit = "    ";
