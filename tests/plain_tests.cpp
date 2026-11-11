@@ -483,6 +483,13 @@ private slots:
         doc.reload();
         QCOMPARE(edit->property("text").toString().size(), lines.size());
         QVERIFY(edit->flags() & QQuickItem::ItemObservesViewport);
+
+        // Shrinking it keeps the flag, since undo brings the long text back.
+        write(dir.filePath("grows.conf"), "a = 1\n");
+        doc.reload();
+        undo(edit.get());
+        QCOMPARE(edit->property("text").toString().size(), lines.size());
+        QVERIFY(edit->flags() & QQuickItem::ItemObservesViewport);
     }
 
     void createsNewFiles()
@@ -772,6 +779,11 @@ private:
     {
         QFile file(path);
         return file.open(QIODevice::ReadOnly) ? file.readAll() : QByteArray("<unreadable>");
+    }
+
+    static void undo(QQuickItem *edit)
+    {
+        edit->property("textDocument").value<QQuickTextDocument *>()->textDocument()->undo();
     }
 
     static void append(QTextDocument *document, const QString &text)

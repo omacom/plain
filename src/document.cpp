@@ -261,10 +261,11 @@ void Document::setText(const QString &text, bool undoably) {
         cursor.select(QTextCursor::Document);
         cursor.insertText(text);
         cursor.endEditBlock();
-        // Only the text property turns on drawing just the visible lines, at
-        // Qt's threshold of 10,000 characters; an undoable reload needs it too.
-        if (m_textEdit)
-            m_textEdit->setFlag(QQuickItem::ItemObservesViewport, text.size() > 10000);
+        // Only the text property turns on drawing just the visible lines, past
+        // Qt's 10,000 characters. Never turned off here, since undo can bring
+        // the long text back without it.
+        if (m_textEdit && text.size() > 10000)
+            m_textEdit->setFlag(QQuickItem::ItemObservesViewport);
     } else if (m_textEdit) {
         m_textEdit->setProperty("text", text);
     } else {
