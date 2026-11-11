@@ -26,7 +26,10 @@
 namespace {
 const QByteArray Bom("\xEF\xBB\xBF");
 
+// Only regular files: opening a FIFO for reading blocks until a writer comes.
 bool readFile(const QString &path, QByteArray *bytes) {
+    if (!QFileInfo(path).isFile())
+        return false;
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly))
         return false;
@@ -212,9 +215,11 @@ bool Document::open(const QString &path) {
     return load(false);
 }
 
+// After a reload refused the file, the editor still holds the text and its
+// undo history, so opening it anyway is an undoable reload too.
 void Document::openAnyway() {
     m_allowLarge = true;
-    load(false);
+    load(!m_target.isEmpty());
 }
 
 void Document::reload() {
@@ -579,6 +584,16 @@ void Document::diskChanged() {
     if (now.isEmpty()) {
         if (!m_diskHash.isEmpty())
             setProblem(Problem::DeletedOnDisk, displayPath());
+        return;
+    }
+    // What load() would refuse before reading isn't read here either; a reload
+    // refuses it and says why.
+    const QFileInfo info(target);
+    if (!info.isFile() || (!m_allowLarge && info.size() > LargeFileBytes)) {
+        if (!modified() && target == m_target)
+            load(true);
+        else
+            setProblem(Problem::ChangedOnDisk, displayPath());
         return;
     }
     QByteArray bytes;
