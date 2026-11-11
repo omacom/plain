@@ -1,2 +1,5 @@
 /build/
 /.claude/
+/pkgbuild/pkg/
+/pkgbuild/src/
+*.pkg.tar.*
