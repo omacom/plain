@@ -703,6 +703,39 @@ private slots:
         QVERIFY(translator.translate("Main", "Save").isNull());
     }
 
+    // 21 is "one" in Russian but plural in English, so an English fallback
+    // must count by English rules.
+    void translatorCountsAFallbackByItsOwnLanguage()
+    {
+        QTemporaryDir dir;
+        write(dir.path() + "/language", "ru\n");
+        write(dir.path() + "/en.json", R"({"%n lines": {"one": "%n line", "other": "%n lines"}})");
+        write(dir.path() + "/ru.json",
+              R"({"%n files": {"one": "%n файл", "few": "%n файла", "many": "%n файлов", "other": "%n файла"}})");
+        Translator translator(dir.path() + "/language", dir.path());
+        QCOMPARE(translator.translate("Main", "%n files", nullptr, 21), QString("%n файл"));
+        QCOMPARE(translator.translate("Main", "%n files", nullptr, 25), QString("%n файлов"));
+        QCOMPARE(translator.translate("Main", "%n lines", nullptr, 21), QString("%n lines"));
+        QCOMPARE(translator.translate("Main", "%n lines", nullptr, 1), QString("%n line"));
+        QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+    }
+
+    // A first language pick can create ~/.config/omarchy itself.
+    void translatorFollowsAFirstPickThatCreatesItsDirectory()
+    {
+        QTemporaryDir dir;
+        write(dir.path() + "/da.json", R"({"Save": "Gem"})");
+        const QString language = dir.path() + "/config/omarchy/language";
+        Translator translator(language, dir.path());
+        QCOMPARE(translator.language(), QString("en"));
+
+        QVERIFY(QDir().mkpath(QFileInfo(language).absolutePath()));
+        write(language, "da\n");
+        QTRY_COMPARE(translator.language(), QString("da"));
+        QCOMPARE(translator.translate("Main", "Save"), QString("Gem"));
+        QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+    }
+
 private:
     static void write(const QString &path, const QByteArray &contents)
     {
