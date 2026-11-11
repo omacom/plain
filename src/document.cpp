@@ -17,6 +17,7 @@
 #include <QTextDocument>
 #include <QUrl>
 
+#include <fcntl.h>
 #include <grp.h>
 #include <pwd.h>
 #include <sys/stat.h>
@@ -26,13 +27,20 @@
 namespace {
 const QByteArray Bom("\xEF\xBB\xBF");
 
-// Only regular files: opening a FIFO for reading blocks until a writer comes.
+// Only regular files. Opened without blocking and checked once open, since
+// opening a FIFO for reading waits for a writer, and the path can be swapped
+// for one between a check and the open.
 bool readFile(const QString &path, QByteArray *bytes) {
-    if (!QFileInfo(path).isFile())
+    const int fd = ::open(QFile::encodeName(path).constData(), O_RDONLY | O_NONBLOCK | O_CLOEXEC);
+    if (fd < 0)
         return false;
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly))
+    struct stat st;
+    QFile file;
+    if (::fstat(fd, &st) != 0 || !S_ISREG(st.st_mode)
+        || !file.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle)) {
+        ::close(fd);
         return false;
+    }
     *bytes = file.readAll();
     return file.error() == QFile::NoError;
 }
