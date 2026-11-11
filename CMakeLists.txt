@@ -28,6 +28,7 @@ enable_testing()
 add_executable(plain_tests tests/plain_tests.cpp)
 target_link_libraries(plain_tests PRIVATE plain_core Qt6::Test)
 add_test(NAME plain_tests COMMAND plain_tests)
+set_tests_properties(plain_tests PROPERTIES ENVIRONMENT QT_QPA_PLATFORM=offscreen)
 
 # --help and --version answer without a display, as on a TTY or over SSH.
 add_test(NAME plain_version_without_display

@@ -57,7 +57,6 @@ Plain is C++ and Qt Quick, built with CMake.
 ```sh
 bin/build      # build/plain
 bin/test       # the test suite, offscreen
-bin/install    # build and install the package from this checkout
 ```
 
 ## License
