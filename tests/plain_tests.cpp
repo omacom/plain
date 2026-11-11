@@ -474,6 +474,15 @@ private slots:
         doc.attach(edit.get());
         QVERIFY(doc.open(dir.filePath("long.conf")));
         QVERIFY(edit->flags() & QQuickItem::ItemObservesViewport);
+
+        // A reload replaces the text undoably, past the text property.
+        write(dir.filePath("grows.conf"), "a = 1\n");
+        QVERIFY(doc.open(dir.filePath("grows.conf")));
+        QVERIFY(!(edit->flags() & QQuickItem::ItemObservesViewport));
+        write(dir.filePath("grows.conf"), lines);
+        doc.reload();
+        QCOMPARE(edit->property("text").toString().size(), lines.size());
+        QVERIFY(edit->flags() & QQuickItem::ItemObservesViewport);
     }
 
     void createsNewFiles()
