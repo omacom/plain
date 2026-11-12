@@ -42,7 +42,7 @@
   "Overwrite": "Přepsat",
   "Overwrite in place": "Přepsat na místě",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain nemůže tento soubor bezpečně nahradit, protože %1. Přepsání přímo na místě je bezpečné, pokud se ukládání nepřeruší.",
-  "Previous (Shift+Enter)": "Předchozí (Shift+Enter)",
+  "Previous (Shift + Enter)": "Předchozí (Shift + Enter)",
   "Reload": "Znovu načíst",
   "Replace": "Nahradit",
   "Replace all": "Nahradit vše",

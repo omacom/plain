@@ -41,7 +41,7 @@
   "Overwrite": "Εγγραφή από πάνω",
   "Overwrite in place": "Απευθείας εγγραφή",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Το Plain δεν μπορεί να αντικαταστήσει με ασφάλεια αυτό το αρχείο επειδή %1. Η απευθείας εγγραφή πάνω του είναι ασφαλής, εκτός αν διακοπεί η αποθήκευση.",
-  "Previous (Shift+Enter)": "Προηγούμενη (Shift+Enter)",
+  "Previous (Shift + Enter)": "Προηγούμενη (Shift + Enter)",
   "Reload": "Επαναφόρτωση",
   "Replace": "Αντικατάσταση",
   "Replace all": "Αντικατάσταση όλων",

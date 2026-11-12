@@ -41,7 +41,7 @@
   "Overwrite": "Overwrite",
   "Overwrite in place": "Overwrite in place",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.",
-  "Previous (Shift+Enter)": "Previous (Shift+Enter)",
+  "Previous (Shift + Enter)": "Previous (Shift + Enter)",
   "Reload": "Reload",
   "Replace": "Replace",
   "Replace all": "Replace all",

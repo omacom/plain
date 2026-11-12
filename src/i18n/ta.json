@@ -41,7 +41,7 @@
   "Overwrite": "மேலெழுது",
   "Overwrite in place": "அதே இடத்தில் மேலெழுது",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "%1 என்பதால், Plain இந்தக் கோப்பைப் பாதுகாப்பாக மாற்றீடு செய்ய முடியாது. சேமிப்பு இடையில் தடைபடாவிட்டால், அதே இடத்தில் மேலெழுதுவது பாதுகாப்பானது.",
-  "Previous (Shift+Enter)": "முந்தையது (Shift+Enter)",
+  "Previous (Shift + Enter)": "முந்தையது (Shift + Enter)",
   "Reload": "மீண்டும் ஏற்று",
   "Replace": "மாற்று",
   "Replace all": "அனைத்தையும் மாற்று",

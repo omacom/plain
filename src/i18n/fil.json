@@ -41,7 +41,7 @@
   "Overwrite": "Patungan",
   "Overwrite in place": "Patungan sa mismong file",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Hindi ligtas na mapapalitan ng Plain ang file na ito dahil %1. Ligtas itong patungan sa mismong file maliban kung maantala ang pag-save.",
-  "Previous (Shift+Enter)": "Nakaraan (Shift+Enter)",
+  "Previous (Shift + Enter)": "Nakaraan (Shift + Enter)",
   "Reload": "I-reload",
   "Replace": "Palitan",
   "Replace all": "Palitan lahat",

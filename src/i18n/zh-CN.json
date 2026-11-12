@@ -40,7 +40,7 @@
   "Overwrite": "覆盖",
   "Overwrite in place": "直接覆盖",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "由于%1，Plain 无法安全地替换此文件。只要保存过程不被中断，直接覆盖就是安全的。",
-  "Previous (Shift+Enter)": "上一个 (Shift+Enter)",
+  "Previous (Shift + Enter)": "上一个 (Shift + Enter)",
   "Reload": "重新加载",
   "Replace": "替换",
   "Replace all": "全部替换",

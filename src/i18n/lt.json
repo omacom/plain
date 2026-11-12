@@ -42,7 +42,7 @@
   "Overwrite": "Perrašyti",
   "Overwrite in place": "Perrašyti vietoje",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain negali saugiai pakeisti šio failo, nes %1. Perrašyti jį vietoje saugu, nebent išsaugojimas būtų nutrauktas.",
-  "Previous (Shift+Enter)": "Ankstesnis (Shift+Enter)",
+  "Previous (Shift + Enter)": "Ankstesnis (Shift + Enter)",
   "Reload": "Įkelti iš naujo",
   "Replace": "Pakeisti",
   "Replace all": "Pakeisti visus",

@@ -41,7 +41,7 @@
   "Overwrite": "උඩින් ලියන්න",
   "Overwrite in place": "එම ස්ථානයේම උඩින් ලියන්න",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "%1 නිසා Plain හට මෙම ගොනුව ආරක්ෂිතව ප්‍රතිස්ථාපනය කළ නොහැක. සුරැකීම අතරමග බාධා නොවුණොත්, එම ස්ථානයේම උඩින් ලිවීම ආරක්ෂිතයි.",
-  "Previous (Shift+Enter)": "පෙර (Shift+Enter)",
+  "Previous (Shift + Enter)": "පෙර (Shift + Enter)",
   "Reload": "යළි පූරණය කරන්න",
   "Replace": "ප්‍රතිස්ථාපනය",
   "Replace all": "සියල්ල ප්‍රතිස්ථාපනය",

@@ -40,7 +40,7 @@
   "Overwrite": "덮어쓰기",
   "Overwrite in place": "제자리에 덮어쓰기",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "%1 때문에 Plain이 이 파일을 안전하게 교체할 수 없습니다. 저장이 중단되지만 않으면 제자리에 덮어써도 안전합니다.",
-  "Previous (Shift+Enter)": "이전 (Shift+Enter)",
+  "Previous (Shift + Enter)": "이전 (Shift + Enter)",
   "Reload": "다시 불러오기",
   "Replace": "바꾸기",
   "Replace all": "모두 바꾸기",

@@ -41,7 +41,7 @@
   "Overwrite": "Overskriv",
   "Overwrite in place": "Overskriv direkte",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain kan ikke erstatte filen trygt fordi %1. Det er trygt å overskrive den direkte, med mindre lagringen blir avbrutt.",
-  "Previous (Shift+Enter)": "Forrige (Shift+Enter)",
+  "Previous (Shift + Enter)": "Forrige (Shift + Enter)",
   "Reload": "Last inn på nytt",
   "Replace": "Erstatt",
   "Replace all": "Erstatt alle",

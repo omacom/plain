@@ -114,7 +114,7 @@ Rectangle {
                 onClicked: bar.caseSensitive = checked
                 tooltip: qsTr("Match case")
             }
-            BarButton { text: "↑"; onClicked: bar.next(true); tooltip: qsTr("Previous (Shift+Enter)") }
+            BarButton { text: "↑"; onClicked: bar.next(true); tooltip: qsTr("Previous (Shift + Enter)") }
             BarButton { text: "↓"; onClicked: bar.next(false); tooltip: qsTr("Next (Enter)") }
             BarButton { text: "✕"; onClicked: bar.hide(); tooltip: qsTr("Close (Escape)") }
         }

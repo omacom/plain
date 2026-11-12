@@ -41,7 +41,7 @@
   "Overwrite": "بازنویسی",
   "Overwrite in place": "بازنویسی درجا",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "این فایل را Plain نمی‌تواند با اطمینان جایگزین کند، چون %1. بازنویسی درجا امن است، مگر اینکه ذخیره‌سازی نیمه‌کاره قطع شود.",
-  "Previous (Shift+Enter)": "قبلی (Shift+Enter)",
+  "Previous (Shift + Enter)": "قبلی (Shift + Enter)",
   "Reload": "بارگذاری دوباره",
   "Replace": "جایگزینی",
   "Replace all": "جایگزینی همه",

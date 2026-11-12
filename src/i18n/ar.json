@@ -45,7 +45,7 @@
   "Overwrite": "الكتابة فوقه",
   "Overwrite in place": "الكتابة فوقه في مكانه",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "لا يستطيع Plain استبدال هذا الملف بأمان لأن %1. الكتابة فوقه في مكانه آمنة ما لم ينقطع الحفظ.",
-  "Previous (Shift+Enter)": "السابق (Shift+Enter)",
+  "Previous (Shift + Enter)": "السابق (Shift + Enter)",
   "Reload": "إعادة التحميل",
   "Replace": "استبدال",
   "Replace all": "استبدال الكل",

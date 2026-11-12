@@ -11,19 +11,19 @@ Rectangle {
     color: Qt.rgba(0, 0, 0, 0.55)
 
     property var shortcuts: [
-        ["Ctrl+S", qsTr("Save")],
-        ["Ctrl+Shift+S", qsTr("Save as")],
-        ["Ctrl+O", qsTr("Open")],
-        ["Ctrl+Z / Ctrl+Shift+Z", qsTr("Undo / redo")],
-        ["Ctrl+F", qsTr("Find")],
-        ["Ctrl+H", qsTr("Find and replace")],
-        ["Enter / Shift+Enter", qsTr("Next / previous match")],
-        ["Ctrl+G", qsTr("Go to line")],
-        ["Ctrl+/", qsTr("Comment or uncomment")],
-        ["Tab / Shift+Tab", qsTr("Indent / outdent")],
-        ["Alt+Z", qsTr("Word wrap")],
-        ["Ctrl+Plus / Ctrl+Minus", qsTr("Text size")],
-        ["Ctrl+W", qsTr("Close")],
+        ["Ctrl + S", qsTr("Save")],
+        ["Ctrl + Shift + S", qsTr("Save as")],
+        ["Ctrl + O", qsTr("Open")],
+        ["Ctrl + Z / Ctrl + Shift + Z", qsTr("Undo / redo")],
+        ["Ctrl + F", qsTr("Find")],
+        ["Ctrl + H", qsTr("Find and replace")],
+        ["Enter / Shift + Enter", qsTr("Next / previous match")],
+        ["Ctrl + G", qsTr("Go to line")],
+        ["Ctrl + /", qsTr("Comment or uncomment")],
+        ["Tab / Shift + Tab", qsTr("Indent / outdent")],
+        ["Alt + Z", qsTr("Word wrap")],
+        ["Ctrl + Plus / Ctrl + Minus", qsTr("Text size")],
+        ["Ctrl + W", qsTr("Close")],
         ["F1", qsTr("Show these shortcuts")]
     ]
 

@@ -41,7 +41,7 @@
   "Overwrite": "ओवरराइट करें",
   "Overwrite in place": "उसी जगह ओवरराइट करें",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain इस फ़ाइल को सुरक्षित रूप से बदल नहीं सकता, क्योंकि %1। इसे उसी जगह ओवरराइट करना सुरक्षित है, बशर्ते सहेजना बीच में न रुके।",
-  "Previous (Shift+Enter)": "पिछला (Shift+Enter)",
+  "Previous (Shift + Enter)": "पिछला (Shift + Enter)",
   "Reload": "फिर से लोड करें",
   "Replace": "बदलें",
   "Replace all": "सभी बदलें",

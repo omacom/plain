@@ -41,7 +41,7 @@
   "Overwrite": "Skrifa yfir",
   "Overwrite in place": "Skrifa beint yfir",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain getur ekki skipt þessari skrá út á öruggan hátt vegna þess að %1. Óhætt er að skrifa beint yfir hana nema vistunin rofni.",
-  "Previous (Shift+Enter)": "Fyrri (Shift+Enter)",
+  "Previous (Shift + Enter)": "Fyrri (Shift + Enter)",
   "Reload": "Endurhlaða",
   "Replace": "Skipta út",
   "Replace all": "Skipta út öllu",

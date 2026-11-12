@@ -41,7 +41,7 @@
   "Overwrite": "Презапиши",
   "Overwrite in place": "Презапиши на място",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain не може да замени този файл безопасно, защото %1. Презаписването на място е безопасно, освен ако записването не бъде прекъснато.",
-  "Previous (Shift+Enter)": "Предишно (Shift+Enter)",
+  "Previous (Shift + Enter)": "Предишно (Shift + Enter)",
   "Reload": "Презареди",
   "Replace": "Замени",
   "Replace all": "Замени всички",
