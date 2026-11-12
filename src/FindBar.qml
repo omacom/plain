@@ -69,70 +69,108 @@ Rectangle {
         next(false)
     }
 
+    // Ctrl+Enter reaches here from the find field too, so it checks what the
+    // Replace all button's enabled state does.
     function replaceAll() {
+        if (!doc.editable || findField.text.length === 0)
+            return
         const count = editing.replaceAll(findField.text, replaceField.text, caseSensitive)
         replaced = qsTr("Replaced %n", "", count)
     }
 
-    ColumnLayout {
+    // Enter steps through matches in the find field and replaces in the replace
+    // field; Ctrl+Enter replaces all from either.
+    function submit(event, replace) {
+        if (replacing && (event.modifiers & Qt.ControlModifier))
+            replaceAll()
+        else if (replace)
+            replaceOne()
+        else
+            next(event.modifiers & Qt.ShiftModifier)
+    }
+
+    // Every button cell has one width, so the rows line up on both edges:
+    // Replace spans Aa and ↑, Replace all spans ↓ and ✕.
+    readonly property real cell: Math.max(caseButton.implicitWidth,
+        (replaceButton.implicitWidth - column.columnSpacing) / 2,
+        (replaceAllButton.implicitWidth - column.columnSpacing) / 2)
+
+    GridLayout {
         id: column
         anchors.fill: parent
         anchors.margins: 6
         anchors.leftMargin: 12
         anchors.rightMargin: 12
-        spacing: 6
+        columns: 5
+        rowSpacing: 6
+        columnSpacing: 8
 
-        RowLayout {
-            spacing: 8
-            FindField {
-                id: findField
-                Layout.fillWidth: true
-                placeholder: qsTr("Find")
-                onTextEdited: {
-                    bar.replaced = ""
-                    bar.recount()
-                    // Find as you type, from where the current match starts.
-                    const found = editing.find(text, editor.area.selectionStart, false, bar.caseSensitive)
-                    if (found.length === 2)
-                        editor.select(found[0], found[1])
-                }
-                Keys.onReturnPressed: function(event) { bar.next(event.modifiers & Qt.ShiftModifier) }
-                Keys.onEnterPressed: function(event) { bar.next(event.modifiers & Qt.ShiftModifier) }
-                Keys.onEscapePressed: bar.hide()
+        FindField {
+            id: findField
+            Layout.fillWidth: true
+            placeholder: qsTr("Find")
+            hint: bar.replaced.length > 0 ? bar.replaced
+                : text.length === 0 ? ""
+                : bar.matches === 0 ? qsTr("No matches") : qsTr("%n matches", "", bar.matches)
+            hintColor: bar.replaced.length === 0 && bar.matches === 0 ? theme.red : theme.secondaryForeground
+            onTextEdited: {
+                bar.replaced = ""
+                bar.recount()
+                // Find as you type, from where the current match starts.
+                const found = editing.find(text, editor.area.selectionStart, false, bar.caseSensitive)
+                if (found.length === 2)
+                    editor.select(found[0], found[1])
             }
-            Label {
-                visible: text.length > 0
-                text: bar.replaced.length > 0 ? bar.replaced
-                    : findField.text.length === 0 ? ""
-                    : bar.matches === 0 ? qsTr("No matches") : qsTr("%n matches", "", bar.matches)
-                color: bar.replaced.length === 0 && bar.matches === 0 ? theme.red : theme.secondaryForeground
-            }
-            BarButton {
-                text: "Aa"
-                checkable: true
-                checked: bar.caseSensitive
-                onClicked: bar.caseSensitive = checked
-                tooltip: qsTr("Match case")
-            }
-            BarButton { text: "↑"; onClicked: bar.next(true); tooltip: qsTr("Previous (Shift + Enter)") }
-            BarButton { text: "↓"; onClicked: bar.next(false); tooltip: qsTr("Next (Enter)") }
-            BarButton { text: "✕"; onClicked: bar.hide(); tooltip: qsTr("Close (Escape)") }
+            Keys.onReturnPressed: function(event) { bar.submit(event, false) }
+            Keys.onEnterPressed: function(event) { bar.submit(event, false) }
+            Keys.onEscapePressed: bar.hide()
+            Keys.onTabPressed: if (bar.replacing) replaceField.forceActiveFocus()
+            Keys.onBacktabPressed: if (bar.replacing) replaceField.forceActiveFocus()
         }
 
-        RowLayout {
+        BarButton {
+            id: caseButton
+            Layout.preferredWidth: bar.cell
+            text: "Aa"
+            checkable: true
+            checked: bar.caseSensitive
+            onClicked: bar.caseSensitive = checked
+            tooltip: qsTr("Match case")
+        }
+        BarButton { Layout.preferredWidth: bar.cell; text: "↑"; onClicked: bar.next(true); tooltip: qsTr("Previous (Shift + Enter)") }
+        BarButton { Layout.preferredWidth: bar.cell; text: "↓"; onClicked: bar.next(false); tooltip: qsTr("Next (Enter)") }
+        BarButton { Layout.preferredWidth: bar.cell; text: "✕"; onClicked: bar.hide(); tooltip: qsTr("Close (Escape)") }
+
+        FindField {
+            id: replaceField
             visible: bar.replacing
-            spacing: 8
-            FindField {
-                id: replaceField
-                Layout.fillWidth: true
-                placeholder: qsTr("Replace with")
-                enabled: doc.editable
-                Keys.onReturnPressed: bar.replaceOne()
-                Keys.onEnterPressed: bar.replaceOne()
-                Keys.onEscapePressed: bar.hide()
-            }
-            BarButton { text: qsTr("Replace"); enabled: doc.editable && findField.text.length > 0; onClicked: bar.replaceOne() }
-            BarButton { text: qsTr("Replace all"); enabled: doc.editable && findField.text.length > 0; onClicked: bar.replaceAll() }
+            Layout.fillWidth: true
+            placeholder: qsTr("Replace with")
+            enabled: doc.editable
+            Keys.onReturnPressed: function(event) { bar.submit(event, true) }
+            Keys.onEnterPressed: function(event) { bar.submit(event, true) }
+            Keys.onEscapePressed: bar.hide()
+            Keys.onTabPressed: findField.forceActiveFocus()
+            Keys.onBacktabPressed: findField.forceActiveFocus()
+        }
+
+        BarButton {
+            id: replaceButton
+            visible: bar.replacing
+            Layout.columnSpan: 2
+            Layout.preferredWidth: 2 * bar.cell + column.columnSpacing
+            text: qsTr("Replace")
+            enabled: doc.editable && findField.text.length > 0
+            onClicked: bar.replaceOne()
+        }
+        BarButton {
+            id: replaceAllButton
+            visible: bar.replacing
+            Layout.columnSpan: 2
+            Layout.preferredWidth: 2 * bar.cell + column.columnSpacing
+            text: qsTr("Replace all")
+            enabled: doc.editable && findField.text.length > 0
+            onClicked: bar.replaceAll()
         }
     }
 }
