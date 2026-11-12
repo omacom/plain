@@ -202,7 +202,8 @@ ApplicationWindow {
     }
 
     // Unsaved changes: Cancel, Discard, Save, laid out like Omawrite's.
-    // Escape cancels; Alt+C, Alt+D and Alt+S pick.
+    // Escape cancels; C, D and S pick, with or without Alt. There is nothing to
+    // type into here, so the bare letter is enough.
     Popup {
         id: unsaved
         anchors.centerIn: parent
@@ -239,9 +240,9 @@ ApplicationWindow {
             }
         }
 
-        Shortcut { sequence: "Alt+C"; enabled: unsaved.opened; onActivated: unsaved.choose("cancel") }
-        Shortcut { sequence: "Alt+D"; enabled: unsaved.opened; onActivated: unsaved.choose("discard") }
-        Shortcut { sequence: "Alt+S"; enabled: unsaved.opened; onActivated: unsaved.choose("save") }
+        Shortcut { sequences: ["C", "Alt+C"]; enabled: unsaved.opened; onActivated: unsaved.choose("cancel") }
+        Shortcut { sequences: ["D", "Alt+D"]; enabled: unsaved.opened; onActivated: unsaved.choose("discard") }
+        Shortcut { sequences: ["S", "Alt+S"]; enabled: unsaved.opened; onActivated: unsaved.choose("save") }
 
         background: DialogBackground {}
 
