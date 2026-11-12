@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Plain
+Name=Editor
 Comment=Edit config and text files
 Exec=plain -- %f
 Icon=plain
