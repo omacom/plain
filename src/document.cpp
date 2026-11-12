@@ -72,9 +72,10 @@ Document::Document(QObject *parent) : QObject(parent) {
 }
 
 // QTextDocument separates its blocks with U+2029, so one in the file would
-// become a line break. It's held in the editor as this private-use character
-// instead, and turned back on save.
-static const QChar ParagraphStandIn(0xE029);
+// become a line break. It's held in the editor as U+FDEF instead, and turned
+// back on save: a noncharacter, which Unicode sets aside for a program's own
+// use, so text typed or pasted in won't hold one.
+static const QChar ParagraphStandIn(0xFDEF);
 
 // Bytes to editable text, or not ok when saving the text again couldn't give
 // back the same file: invalid UTF-8 (a sequence cut off at the end too), NUL
