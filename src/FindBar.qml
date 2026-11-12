@@ -69,7 +69,11 @@ Rectangle {
         next(false)
     }
 
+    // Ctrl+Enter reaches here from the find field too, so it checks what the
+    // Replace all button's enabled state does.
     function replaceAll() {
+        if (!doc.editable || findField.text.length === 0)
+            return
         const count = editing.replaceAll(findField.text, replaceField.text, caseSensitive)
         replaced = qsTr("Replaced %n", "", count)
     }
