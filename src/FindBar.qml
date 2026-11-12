@@ -69,7 +69,7 @@ Rectangle {
         next(false)
     }
 
-    // Ctrl+Enter reaches here from the find field too, so it checks what the
+    // Shift+Enter reaches here with no search too, so it checks what the
     // Replace all button's enabled state does.
     function replaceAll() {
         if (!doc.editable || findField.text.length === 0)
@@ -78,15 +78,14 @@ Rectangle {
         replaced = qsTr("Replaced %n", "", count)
     }
 
-    // Enter steps through matches in the find field and replaces in the replace
-    // field; Ctrl+Enter replaces all from either.
+    // Enter steps through matches in the find field, Shift+Enter backward; in
+    // the replace field Enter replaces one, Shift+Enter replaces all.
     function submit(event, replace) {
-        if (replacing && (event.modifiers & Qt.ControlModifier))
-            replaceAll()
-        else if (replace)
-            replaceOne()
+        const shift = event.modifiers & Qt.ShiftModifier
+        if (replace)
+            shift ? replaceAll() : replaceOne()
         else
-            next(event.modifiers & Qt.ShiftModifier)
+            next(shift)
     }
 
     // Every button cell has one width, so the rows line up on both edges:

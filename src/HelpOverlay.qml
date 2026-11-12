@@ -18,7 +18,7 @@ Rectangle {
         ["Ctrl + F", qsTr("Find")],
         ["Ctrl + H", qsTr("Find and replace")],
         ["Enter / Shift + Enter", qsTr("Next / previous match")],
-        ["Ctrl + Enter", qsTr("Replace all")],
+        ["Shift + Enter", qsTr("Replace all")],
         ["Ctrl + G", qsTr("Go to line")],
         ["Ctrl + /", qsTr("Comment or uncomment")],
         ["Tab / Shift + Tab", qsTr("Indent / outdent")],
