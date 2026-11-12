@@ -11,7 +11,7 @@ ApplicationWindow {
     minimumWidth: 480
     minimumHeight: 320
     visible: true
-    title: (doc.modified ? "● " : "") + doc.fileName + " — Plain"
+    title: (doc.modified ? "● " : "") + doc.fileName + " — " + qsTr("Text Editor")
     color: theme.background
     // The chrome (banner, dialogs, labels) at the desktop's text size too.
     font.pixelSize: theme.textSize
