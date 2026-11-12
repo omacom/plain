@@ -269,7 +269,7 @@ private slots:
         QVERIFY(!Document::decode(QByteArray("a\0b", 3)).ok);
         QVERIFY(!Document::decode("caf\xE9\n").ok);           // Latin-1, not UTF-8
         QVERIFY(!Document::decode("a\rb\n").ok);              // lone CR
-        QVERIFY(!Document::decode("a\xE2\x80\xA9" "b").ok);   // U+2029
+        QVERIFY(!Document::decode("a\xEE\x80\xA9" "b").ok);   // U+E029, U+2029's stand-in
         QVERIFY(Document::decode("").ok);
         // A sequence cut off at the end, which a stateful decoder holds back
         // without an error, so saving would drop it.
@@ -295,6 +295,7 @@ private slots:
         QTest::newRow("double bom") << QByteArray("\xEF\xBB\xBF\xEF\xBB\xBF" "x\n");
         QTest::newRow("nbsp and tabs") << QByteArray("a\xC2\xA0" "b\n\tc\n");
         QTest::newRow("line separator") << QByteArray("a\xE2\x80\xA8" "b\n");
+        QTest::newRow("paragraph separator") << QByteArray("a\xE2\x80\xA9" "b\n");
         QTest::newRow("empty") << QByteArray();
         QTest::newRow("only newline") << QByteArray("\n");
         QTest::newRow("unicode") << QByteArray("名前 = \"ø\" # 🎉\n");

@@ -37,7 +37,7 @@ public:
         NotFound,        // the path doesn't exist and its folder doesn't either
         NotRegular,      // a folder, device or pipe
         NotReadable,     // permission denied: belongs to root or someone else
-        NotText,         // not UTF-8, NUL bytes, lone CRs, or U+2029
+        NotText,         // not UTF-8, NUL bytes, lone CRs, or U+E029
         TooLarge,        // big enough that TextEdit would be slow; asks first
         MixedEndings,    // opened fine; will be saved with the majority ending
         ChangedOnDisk,   // changed elsewhere while there are unsaved edits
