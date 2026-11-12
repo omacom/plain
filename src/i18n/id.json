@@ -40,7 +40,7 @@
   "Overwrite": "Timpa",
   "Overwrite in place": "Timpa langsung",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain tidak dapat mengganti berkas ini dengan aman karena %1. Menimpanya langsung tetap aman, kecuali penyimpanan terputus.",
-  "Previous (Shift+Enter)": "Sebelumnya (Shift+Enter)",
+  "Previous (Shift + Enter)": "Sebelumnya (Shift + Enter)",
   "Reload": "Muat ulang",
   "Replace": "Ganti",
   "Replace all": "Ganti semua",

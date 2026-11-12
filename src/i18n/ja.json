@@ -40,7 +40,7 @@
   "Overwrite": "上書き",
   "Overwrite in place": "直接上書き",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "%1ため、Plainはこのファイルを安全に置き換えられません。保存が中断されない限り、直接上書きしても安全です。",
-  "Previous (Shift+Enter)": "前へ (Shift+Enter)",
+  "Previous (Shift + Enter)": "前へ (Shift + Enter)",
   "Reload": "再読み込み",
   "Replace": "置換",
   "Replace all": "すべて置換",

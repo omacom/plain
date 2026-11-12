@@ -41,7 +41,7 @@
   "Overwrite": "Ustidan yozish",
   "Overwrite in place": "Joyida ustidan yozish",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain bu faylni xavfsiz almashtira olmaydi, chunki %1. Saqlash toʻxtab qolmasa, joyida ustidan yozish xavfsiz.",
-  "Previous (Shift+Enter)": "Oldingi (Shift+Enter)",
+  "Previous (Shift + Enter)": "Oldingi (Shift + Enter)",
   "Reload": "Qayta yuklash",
   "Replace": "Almashtirish",
   "Replace all": "Hammasini almashtirish",

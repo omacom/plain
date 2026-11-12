@@ -42,7 +42,7 @@
   "Overwrite": "Suprascrie",
   "Overwrite in place": "Suprascrie direct",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain nu poate înlocui acest fișier în siguranță deoarece %1. Suprascrierea directă este sigură, cu excepția cazului în care salvarea este întreruptă.",
-  "Previous (Shift+Enter)": "Anterior (Shift+Enter)",
+  "Previous (Shift + Enter)": "Anterior (Shift + Enter)",
   "Reload": "Reîncarcă",
   "Replace": "Înlocuiește",
   "Replace all": "Înlocuiește tot",

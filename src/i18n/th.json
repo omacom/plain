@@ -40,7 +40,7 @@
   "Overwrite": "เขียนทับ",
   "Overwrite in place": "เขียนทับไฟล์เดิม",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain แทนที่ไฟล์นี้อย่างปลอดภัยไม่ได้ เพราะ%1 การเขียนทับไฟล์เดิมโดยตรงจะปลอดภัย เว้นแต่การบันทึกถูกขัดจังหวะ",
-  "Previous (Shift+Enter)": "ก่อนหน้า (Shift+Enter)",
+  "Previous (Shift + Enter)": "ก่อนหน้า (Shift + Enter)",
   "Reload": "โหลดใหม่",
   "Replace": "แทนที่",
   "Replace all": "แทนที่ทั้งหมด",

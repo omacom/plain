@@ -42,7 +42,7 @@
   "Overwrite": "דריסה",
   "Overwrite in place": "דריסה במקום",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "אין ל־Plain אפשרות להחליף את הקובץ הזה בבטחה כי %1. דריסה במקום בטוחה, אלא אם השמירה תיקטע באמצע.",
-  "Previous (Shift+Enter)": "הקודם (Shift+Enter)",
+  "Previous (Shift + Enter)": "הקודם (Shift + Enter)",
   "Reload": "טעינה מחדש",
   "Replace": "החלפה",
   "Replace all": "החלפת הכול",

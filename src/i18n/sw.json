@@ -41,7 +41,7 @@
   "Overwrite": "Andika juu",
   "Overwrite in place": "Andika juu papo hapo",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain haiwezi kubadilisha faili hii kwa usalama kwa sababu %1. Kuandika juu yake papo hapo ni salama, isipokuwa uhifadhi ukikatizwa.",
-  "Previous (Shift+Enter)": "Iliyotangulia (Shift+Enter)",
+  "Previous (Shift + Enter)": "Iliyotangulia (Shift + Enter)",
   "Reload": "Pakia upya",
   "Replace": "Badilisha",
   "Replace all": "Badilisha zote",

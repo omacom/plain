@@ -42,7 +42,7 @@
   "Overwrite": "Sobreescriu",
   "Overwrite in place": "Sobreescriu directament",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain no pot substituir aquest fitxer amb seguretat perquè %1. Sobreescriure'l directament és segur, tret que s'interrompi el desament.",
-  "Previous (Shift+Enter)": "Anterior (Shift+Enter)",
+  "Previous (Shift + Enter)": "Anterior (Shift + Enter)",
   "Reload": "Torna a carregar",
   "Replace": "Substitueix",
   "Replace all": "Substitueix-ho tot",

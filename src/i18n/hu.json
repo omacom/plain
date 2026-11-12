@@ -41,7 +41,7 @@
   "Overwrite": "Felülírás",
   "Overwrite in place": "Felülírás helyben",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "A Plain nem tudja biztonságosan lecserélni ezt a fájlt, mert %1. A helyben történő felülírás biztonságos, hacsak meg nem szakad a mentés.",
-  "Previous (Shift+Enter)": "Előző (Shift+Enter)",
+  "Previous (Shift + Enter)": "Előző (Shift + Enter)",
   "Reload": "Újratöltés",
   "Replace": "Csere",
   "Replace all": "Összes cseréje",

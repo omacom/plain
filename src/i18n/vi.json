@@ -40,7 +40,7 @@
   "Overwrite": "Ghi đè",
   "Overwrite in place": "Ghi đè trực tiếp",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain không thể thay thế tệp này một cách an toàn vì %1. Ghi đè trực tiếp vẫn an toàn trừ khi quá trình lưu bị gián đoạn.",
-  "Previous (Shift+Enter)": "Trước (Shift+Enter)",
+  "Previous (Shift + Enter)": "Trước (Shift + Enter)",
   "Reload": "Tải lại",
   "Replace": "Thay thế",
   "Replace all": "Thay thế tất cả",

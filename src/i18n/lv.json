@@ -42,7 +42,7 @@
   "Overwrite": "Pārrakstīt",
   "Overwrite in place": "Pārrakstīt uz vietas",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain nevar droši aizstāt šo failu, jo %1. Pārrakstīšana uz vietas ir droša, ja vien saglabāšana netiek pārtraukta.",
-  "Previous (Shift+Enter)": "Iepriekšējā (Shift+Enter)",
+  "Previous (Shift + Enter)": "Iepriekšējā (Shift + Enter)",
   "Reload": "Pārlādēt",
   "Replace": "Aizstāt",
   "Replace all": "Aizstāt visas",

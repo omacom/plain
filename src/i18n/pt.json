@@ -42,7 +42,7 @@
   "Overwrite": "Sobrescrever",
   "Overwrite in place": "Sobrescrever diretamente",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "O Plain não consegue substituir este ficheiro em segurança porque %1. Sobrescrevê-lo diretamente é seguro, a menos que a gravação seja interrompida.",
-  "Previous (Shift+Enter)": "Anterior (Shift+Enter)",
+  "Previous (Shift + Enter)": "Anterior (Shift + Enter)",
   "Reload": "Recarregar",
   "Replace": "Substituir",
   "Replace all": "Substituir tudo",

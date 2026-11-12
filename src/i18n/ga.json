@@ -44,7 +44,7 @@
   "Overwrite": "Forscríobh",
   "Overwrite in place": "Forscríobh san áit",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Ní féidir le Plain an comhad seo a ionadú go sábháilte mar %1. Is sábháilte é a fhorscríobh san áit ina bhfuil sé, mura gcuirtear isteach ar an sábháil.",
-  "Previous (Shift+Enter)": "Siar (Shift+Enter)",
+  "Previous (Shift + Enter)": "Siar (Shift + Enter)",
   "Reload": "Athlódáil",
   "Replace": "Ionadaigh",
   "Replace all": "Ionadaigh gach ceann",

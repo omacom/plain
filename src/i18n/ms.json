@@ -40,7 +40,7 @@
   "Overwrite": "Tulis ganti",
   "Overwrite in place": "Tulis ganti di tempat",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain tidak dapat menggantikan fail ini dengan selamat kerana %1. Menulis ganti di tempat adalah selamat kecuali jika proses simpan terganggu.",
-  "Previous (Shift+Enter)": "Sebelumnya (Shift+Enter)",
+  "Previous (Shift + Enter)": "Sebelumnya (Shift + Enter)",
   "Reload": "Muat semula",
   "Replace": "Ganti",
   "Replace all": "Ganti semua",

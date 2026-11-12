@@ -41,7 +41,7 @@
   "Overwrite": "ওভাররাইট করুন",
   "Overwrite in place": "জায়গাতেই ওভাররাইট করুন",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain এই ফাইলটি নিরাপদে প্রতিস্থাপন করতে পারছে না, কারণ %1। সংরক্ষণ মাঝপথে বাধা না পেলে জায়গাতেই ওভাররাইট করা নিরাপদ।",
-  "Previous (Shift+Enter)": "পূর্ববর্তী (Shift+Enter)",
+  "Previous (Shift + Enter)": "পূর্ববর্তী (Shift + Enter)",
   "Reload": "আবার লোড করুন",
   "Replace": "প্রতিস্থাপন",
   "Replace all": "সব প্রতিস্থাপন",

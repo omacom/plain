@@ -42,7 +42,7 @@
   "Overwrite": "Sobrescribir",
   "Overwrite in place": "Sobrescribir directamente",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain no puede reemplazar este archivo de forma segura porque %1. Sobrescribirlo directamente es seguro, a menos que se interrumpa el guardado.",
-  "Previous (Shift+Enter)": "Anterior (Shift+Enter)",
+  "Previous (Shift + Enter)": "Anterior (Shift + Enter)",
   "Reload": "Recargar",
   "Replace": "Reemplazar",
   "Replace all": "Reemplazar todo",

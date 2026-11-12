@@ -42,7 +42,7 @@
   "Overwrite": "Écraser",
   "Overwrite in place": "Écraser sur place",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain ne peut pas remplacer ce fichier en toute sécurité, car %1. L'écraser sur place est sans risque, sauf si l'enregistrement est interrompu.",
-  "Previous (Shift+Enter)": "Précédent (Shift+Enter)",
+  "Previous (Shift + Enter)": "Précédent (Shift + Enter)",
   "Reload": "Recharger",
   "Replace": "Remplacer",
   "Replace all": "Tout remplacer",

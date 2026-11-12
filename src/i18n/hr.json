@@ -42,7 +42,7 @@
   "Overwrite": "Prepiši",
   "Overwrite in place": "Prepiši na mjestu",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain ne može sigurno zamijeniti ovu datoteku jer %1. Prepisivanje na mjestu sigurno je, osim ako se spremanje ne prekine.",
-  "Previous (Shift+Enter)": "Prethodni (Shift+Enter)",
+  "Previous (Shift + Enter)": "Prethodni (Shift + Enter)",
   "Reload": "Ponovno učitaj",
   "Replace": "Zamijeni",
   "Replace all": "Zamijeni sve",

@@ -41,7 +41,7 @@
   "Overwrite": "Üzerine yaz",
   "Overwrite in place": "Yerinde üzerine yaz",
   "Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.": "Plain bu dosyayı güvenle yenisiyle değiştiremiyor, çünkü %1. Kayıt yarıda kesilmediği sürece dosyanın üzerine yerinde yazmak güvenlidir.",
-  "Previous (Shift+Enter)": "Önceki (Shift+Enter)",
+  "Previous (Shift + Enter)": "Önceki (Shift + Enter)",
   "Reload": "Yeniden yükle",
   "Replace": "Değiştir",
   "Replace all": "Tümünü değiştir",
