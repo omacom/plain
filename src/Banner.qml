@@ -22,17 +22,17 @@ Rectangle {
     readonly property string message: {
         switch (problem) {
         case "NotFound": return qsTr("The folder for %1 doesn't exist.").arg(detail)
-        case "NotRegular": return qsTr("%1 isn't a file Plain can open.").arg(detail)
+        case "NotRegular": return qsTr("%1 isn't a file Editor can open.").arg(detail)
         case "NotReadable": return qsTr("You don't have permission to read %1. To edit it as administrator, run sudoedit in a terminal.").arg(detail)
-        case "NotText": return qsTr("%1 isn't a UTF-8 text file, so Plain didn't open it.").arg(detail)
-        case "TooLarge": return qsTr("%1 is large or has very long lines. Plain is made for config files and may be slow with it.").arg(detail)
+        case "NotText": return qsTr("%1 isn't a UTF-8 text file, so Editor didn't open it.").arg(detail)
+        case "TooLarge": return qsTr("%1 is large or has very long lines. Editor is made for config files and may be slow with it.").arg(detail)
         case "MixedEndings": return qsTr("This file mixes Windows and Unix line endings. Saving will use %1 throughout.").arg(doc.lineEnding)
         case "ChangedOnDisk": return qsTr("%1 changed on disk.").arg(detail)
         case "DeletedOnDisk": return qsTr("%1 was deleted on disk.").arg(detail)
         case "Conflict": return qsTr("%1 changed on disk since you opened it. Saving would overwrite those changes.").arg(detail)
         case "Retargeted": return qsTr("This link now points to %1.").arg(detail)
         case "NotWritable": return qsTr("You don't have permission to change %1. To edit it as administrator, run sudoedit in a terminal.").arg(detail)
-        case "NeedsInPlace": return qsTr("Plain can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.").arg(detail)
+        case "NeedsInPlace": return qsTr("Editor can't replace this file safely because %1. Overwriting it in place is safe unless the save is interrupted.").arg(detail)
         case "SaveFailed": return qsTr("Couldn't save: %1").arg(detail)
         case "ModeLost": return qsTr("Saved %1, but couldn't restore its special permission bits.").arg(detail)
         }
