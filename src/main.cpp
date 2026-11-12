@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 
     QGuiApplication app(argc, argv);
     app.setApplicationName("plain");
-    app.setApplicationVersion("0.3.2");
+    app.setApplicationVersion("0.3.3");
 
     const Arguments arguments = Arguments::parse(app.arguments());
     if (arguments.help) {
