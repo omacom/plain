@@ -7,9 +7,12 @@ TextInput {
     id: field
 
     property string placeholder
+    // Dim text at the right end, like "2 matches", that typing stops short of.
+    property string hint
+    property color hintColor: theme.secondaryForeground
 
     leftPadding: 8
-    rightPadding: 8
+    rightPadding: hint.length > 0 ? hintLabel.implicitWidth + 16 : 8
     topPadding: 5
     bottomPadding: 5
     verticalAlignment: TextInput.AlignVCenter
@@ -38,5 +41,15 @@ TextInput {
         font: field.font
         color: theme.secondaryForeground
         visible: field.text.length === 0 && field.preeditText.length === 0
+    }
+
+    Text {
+        id: hintLabel
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        anchors.verticalCenter: parent.verticalCenter
+        text: field.hint
+        font: field.font
+        color: field.hintColor
     }
 }
