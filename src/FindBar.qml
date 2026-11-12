@@ -62,11 +62,16 @@ Rectangle {
         return caseSensitive ? selected === findField.text : selected.toLowerCase() === findField.text.toLowerCase()
     }
 
-    function replaceOne() {
+    // Backward leaves the cursor before the replacement, so the search back
+    // doesn't find the match inside what was just put in.
+    function replaceOne(backward) {
         const area = editor.area
-        if (findField.text.length > 0 && selectionMatches())
-            area.cursorPosition = editing.replace(area.selectionStart, area.selectionEnd, replaceField.text)
-        next(false)
+        if (findField.text.length > 0 && selectionMatches()) {
+            const start = area.selectionStart
+            const end = editing.replace(start, area.selectionEnd, replaceField.text)
+            area.cursorPosition = backward ? start : end
+        }
+        next(backward)
     }
 
     // Ctrl+Enter reaches here from the find field too, so it checks what the
@@ -78,15 +83,17 @@ Rectangle {
         replaced = qsTr("Replaced %n", "", count)
     }
 
-    // Enter steps through matches in the find field and replaces in the replace
-    // field; Ctrl+Enter replaces all from either.
+    // Enter steps forward through matches in the find field and replaces one
+    // and steps on in the replace field, with Shift backward in both;
+    // Ctrl+Enter replaces all from either.
     function submit(event, replace) {
+        const backward = event.modifiers & Qt.ShiftModifier
         if (replacing && (event.modifiers & Qt.ControlModifier))
             replaceAll()
         else if (replace)
-            replaceOne()
+            replaceOne(backward)
         else
-            next(event.modifiers & Qt.ShiftModifier)
+            next(backward)
     }
 
     // Two columns, so both fields share a width, and each row's buttons sit at
@@ -159,7 +166,7 @@ Rectangle {
             BarButton {
                 text: qsTr("Replace")
                 enabled: doc.editable && findField.text.length > 0
-                onClicked: bar.replaceOne()
+                onClicked: bar.replaceOne(false)
             }
             BarButton {
                 text: qsTr("Replace all")
