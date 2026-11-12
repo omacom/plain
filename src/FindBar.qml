@@ -89,19 +89,15 @@ Rectangle {
             next(event.modifiers & Qt.ShiftModifier)
     }
 
-    // Every button cell has one width, so the rows line up on both edges:
-    // Replace spans Aa and ↑, Replace all spans ↓ and ✕.
-    readonly property real cell: Math.max(caseButton.implicitWidth,
-        (replaceButton.implicitWidth - column.columnSpacing) / 2,
-        (replaceAllButton.implicitWidth - column.columnSpacing) / 2)
-
+    // Two columns, so both fields share a width, and each row's buttons sit at
+    // their natural size against the right edge: ✕ lines up with Replace all.
     GridLayout {
         id: column
         anchors.fill: parent
         anchors.margins: 6
         anchors.leftMargin: 12
         anchors.rightMargin: 12
-        columns: 5
+        columns: 2
         rowSpacing: 6
         columnSpacing: 8
 
@@ -128,18 +124,20 @@ Rectangle {
             Keys.onBacktabPressed: if (bar.replacing) replaceField.forceActiveFocus()
         }
 
-        BarButton {
-            id: caseButton
-            Layout.preferredWidth: bar.cell
-            text: "Aa"
-            checkable: true
-            checked: bar.caseSensitive
-            onClicked: bar.caseSensitive = checked
-            tooltip: qsTr("Match case")
+        RowLayout {
+            Layout.alignment: Qt.AlignRight
+            spacing: 4
+            BarButton {
+                text: "Aa"
+                checkable: true
+                checked: bar.caseSensitive
+                onClicked: bar.caseSensitive = checked
+                tooltip: qsTr("Match case")
+            }
+            BarButton { text: "↑"; onClicked: bar.next(true); tooltip: qsTr("Previous (Shift + Enter)") }
+            BarButton { text: "↓"; onClicked: bar.next(false); tooltip: qsTr("Next (Enter)") }
+            BarButton { text: "✕"; onClicked: bar.hide(); tooltip: qsTr("Close (Escape)") }
         }
-        BarButton { Layout.preferredWidth: bar.cell; text: "↑"; onClicked: bar.next(true); tooltip: qsTr("Previous (Shift + Enter)") }
-        BarButton { Layout.preferredWidth: bar.cell; text: "↓"; onClicked: bar.next(false); tooltip: qsTr("Next (Enter)") }
-        BarButton { Layout.preferredWidth: bar.cell; text: "✕"; onClicked: bar.hide(); tooltip: qsTr("Close (Escape)") }
 
         FindField {
             id: replaceField
@@ -154,23 +152,20 @@ Rectangle {
             Keys.onBacktabPressed: findField.forceActiveFocus()
         }
 
-        BarButton {
-            id: replaceButton
+        RowLayout {
             visible: bar.replacing
-            Layout.columnSpan: 2
-            Layout.preferredWidth: 2 * bar.cell + column.columnSpacing
-            text: qsTr("Replace")
-            enabled: doc.editable && findField.text.length > 0
-            onClicked: bar.replaceOne()
-        }
-        BarButton {
-            id: replaceAllButton
-            visible: bar.replacing
-            Layout.columnSpan: 2
-            Layout.preferredWidth: 2 * bar.cell + column.columnSpacing
-            text: qsTr("Replace all")
-            enabled: doc.editable && findField.text.length > 0
-            onClicked: bar.replaceAll()
+            Layout.alignment: Qt.AlignRight
+            spacing: 4
+            BarButton {
+                text: qsTr("Replace")
+                enabled: doc.editable && findField.text.length > 0
+                onClicked: bar.replaceOne()
+            }
+            BarButton {
+                text: qsTr("Replace all")
+                enabled: doc.editable && findField.text.length > 0
+                onClicked: bar.replaceAll()
+            }
         }
     }
 }
