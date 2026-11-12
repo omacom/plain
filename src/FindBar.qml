@@ -33,7 +33,7 @@ Rectangle {
         replacing = replace
         visible = true
         const area = editor.area
-        if (area.selectionStart !== area.selectionEnd && area.selectedText.indexOf(" ") < 0)
+        if (area.selectionStart !== area.selectionEnd && area.selectedText.indexOf("\u2029") < 0)
             findField.text = area.selectedText
         findField.forceActiveFocus()
         findField.selectAll()

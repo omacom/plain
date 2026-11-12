@@ -71,10 +71,16 @@ Document::Document(QObject *parent) : QObject(parent) {
     connect(&m_debounce, &QTimer::timeout, this, &Document::diskChanged);
 }
 
+// QTextDocument separates its blocks with U+2029, so one in the file would
+// become a line break. It's held in the editor as U+FDEF instead, and turned
+// back on save: a noncharacter, which Unicode sets aside for a program's own
+// use, so text typed or pasted in won't hold one.
+static const QChar ParagraphStandIn(0xFDEF);
+
 // Bytes to editable text, or not ok when saving the text again couldn't give
 // back the same file: invalid UTF-8 (a sequence cut off at the end too), NUL
-// bytes, carriage returns that aren't part of CRLF, or U+2029, which
-// QTextDocument turns into a line break.
+// bytes, carriage returns that aren't part of CRLF, or the U+2029 stand-in
+// itself, which saving would turn into U+2029.
 Document::Decoded Document::decode(const QByteArray &input) {
     Decoded result;
     QByteArray bytes = input;
@@ -91,8 +97,9 @@ Document::Decoded Document::decode(const QByteArray &input) {
     QStringDecoder decoder(QStringConverter::Utf8,
                            QStringConverter::Flag::Stateless | QStringConverter::Flag::ConvertInitialBom);
     QString text = decoder.decode(bytes);
-    if (decoder.hasError() || text.contains(QChar::ParagraphSeparator))
+    if (decoder.hasError() || text.contains(ParagraphStandIn))
         return result;
+    text.replace(QChar::ParagraphSeparator, ParagraphStandIn);
 
     int crlf = 0, lf = 0;
     for (qsizetype i = 0; i < text.size(); ++i) {
@@ -121,7 +128,7 @@ QByteArray Document::encode(const QTextDocument *document, bool bom, bool crlf) 
     QString text;
     const QString ending = crlf ? "\r\n" : "\n";
     for (QTextBlock block = document->begin(); block.isValid(); block = block.next()) {
-        text += block.text();
+        text += block.text().replace(ParagraphStandIn, QChar::ParagraphSeparator);
         if (block.next().isValid())
             text += ending;
     }
