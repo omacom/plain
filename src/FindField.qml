@@ -11,8 +11,11 @@ TextInput {
     property string hint
     property color hintColor: theme.secondaryForeground
 
-    leftPadding: 8
-    rightPadding: hint.length > 0 ? hintLabel.implicitWidth + 16 : 8
+    // Room for the hint at its end, which is the left in a right-to-left
+    // window, where the hint's anchor is mirrored but padding isn't.
+    readonly property real endPadding: hint.length > 0 ? hintLabel.implicitWidth + 16 : 8
+    leftPadding: LayoutMirroring.enabled ? endPadding : 8
+    rightPadding: LayoutMirroring.enabled ? 8 : endPadding
     topPadding: 5
     bottomPadding: 5
     verticalAlignment: TextInput.AlignVCenter
