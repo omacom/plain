@@ -62,14 +62,19 @@ Rectangle {
         return caseSensitive ? selected === findField.text : selected.toLowerCase() === findField.text.toLowerCase()
     }
 
-    function replaceOne() {
+    // Backward leaves the cursor before the replacement, so the search back
+    // doesn't find the match inside what was just put in.
+    function replaceOne(backward) {
         const area = editor.area
-        if (findField.text.length > 0 && selectionMatches())
-            area.cursorPosition = editing.replace(area.selectionStart, area.selectionEnd, replaceField.text)
-        next(false)
+        if (findField.text.length > 0 && selectionMatches()) {
+            const start = area.selectionStart
+            const end = editing.replace(start, area.selectionEnd, replaceField.text)
+            area.cursorPosition = backward ? start : end
+        }
+        next(backward)
     }
 
-    // Shift+Enter reaches here with no search too, so it checks what the
+    // Ctrl+Enter reaches here from the find field too, so it checks what the
     // Replace all button's enabled state does.
     function replaceAll() {
         if (!doc.editable || findField.text.length === 0)
@@ -78,14 +83,17 @@ Rectangle {
         replaced = qsTr("Replaced %n", "", count)
     }
 
-    // Enter steps through matches in the find field, Shift+Enter backward; in
-    // the replace field Enter replaces one, Shift+Enter replaces all.
+    // Enter steps forward through matches in the find field and replaces one
+    // and steps on in the replace field, with Shift backward in both;
+    // Ctrl+Enter replaces all from either.
     function submit(event, replace) {
-        const shift = event.modifiers & Qt.ShiftModifier
-        if (replace)
-            shift ? replaceAll() : replaceOne()
+        const backward = event.modifiers & Qt.ShiftModifier
+        if (replacing && (event.modifiers & Qt.ControlModifier))
+            replaceAll()
+        else if (replace)
+            replaceOne(backward)
         else
-            next(shift)
+            next(backward)
     }
 
     // Every button cell has one width, so the rows line up on both edges:
@@ -160,7 +168,7 @@ Rectangle {
             Layout.preferredWidth: 2 * bar.cell + column.columnSpacing
             text: qsTr("Replace")
             enabled: doc.editable && findField.text.length > 0
-            onClicked: bar.replaceOne()
+            onClicked: bar.replaceOne(false)
         }
         BarButton {
             id: replaceAllButton
