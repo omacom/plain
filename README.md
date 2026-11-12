@@ -52,7 +52,7 @@ Omarchy installs Plain as the `plain` package from its package repository (`omar
 
 ## Build
 
-Plain is C++ and Qt Quick, built with qmake.
+Plain is C++ and Qt Quick, built with CMake.
 
 ```sh
 bin/build      # build/plain
