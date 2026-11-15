@@ -35,7 +35,8 @@ Rectangle {
         ["Alt + Enter", qsTr("Rename, duplicate or delete in files")],
         ["Ctrl + Z / Ctrl + Shift + Z", qsTr("Undo / redo")],
         ["Ctrl + F", qsTr("Find")],
-        ["Ctrl + H", qsTr("Find and replace (in files: hidden files)")],
+        ["Ctrl + H", qsTr("Find and replace")],
+        ["Ctrl + H " + qsTr("in files"), qsTr("Show or hide hidden files")],
         ["Enter / Shift + Enter", qsTr("Next / previous match")],
         ["Ctrl + Enter", qsTr("Replace all")],
         ["Page Up / Page Down", qsTr("A screenful up or down")],
@@ -99,6 +100,8 @@ Rectangle {
                         Layout.row: index
                         Layout.column: 1
                         Layout.fillWidth: true
+                        // Wrapped, rather than run past the panel's edge.
+                        wrapMode: Text.Wrap
                         text: modelData[1]
                         color: theme.foreground
                     }
