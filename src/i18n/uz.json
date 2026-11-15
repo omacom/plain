@@ -2,6 +2,7 @@
   " copy": " nusxasi",
   " copy %1": " nusxasi %1",
   "%1 already exists here": "%1 bu yerda allaqachon mavjud",
+  "%1 can't be duplicated inside itself": "%1 nusxasini oʻz ichida yaratib boʻlmaydi",
   "%1 can't be read back to check it hasn't changed": "%1 oʻzgarmaganini tekshirish uchun uni qayta oʻqib boʻlmadi",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "%1 siz uni ochganingizdan beri diskda oʻzgargan. Saqlasangiz, bu oʻzgarishlar ustidan yoziladi.",
   "%1 changed on disk.": "%1 diskda oʻzgardi.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 UTF-8 matn fayli emas, shuning uchun Matn muharriri uni ochmadi.",
   "%1 isn't a file Text Editor can open.": "%1 Matn muharriri ocholadigan fayl emas.",
   "%1 isn't a folder": "%1 jild emas",
+  "%1 points at nothing to duplicate": "%1 nusxasi yaratiladigan hech narsaga ishora qilmaydi",
   "%1 was deleted on disk.": "%1 diskdan oʻchirildi.",
   "%n matches": {
     "one": "%n ta moslik",

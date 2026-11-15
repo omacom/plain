@@ -2,6 +2,7 @@
   " copy": " kópia",
   " copy %1": " kópia %1",
   "%1 already exists here": "%1 tu už existuje",
+  "%1 can't be duplicated inside itself": "%1 sa nedá duplikovať do seba samého",
   "%1 can't be read back to check it hasn't changed": "súbor %1 sa nedá znova načítať a overiť, že sa nezmenil",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Súbor %1 sa od otvorenia zmenil na disku. Uložením by ste tieto zmeny prepísali.",
   "%1 changed on disk.": "Súbor %1 sa na disku zmenil.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 nie je textový súbor v UTF-8, takže ho Textový editor neotvoril.",
   "%1 isn't a file Text Editor can open.": "%1 nie je súbor, ktorý Textový editor dokáže otvoriť.",
   "%1 isn't a folder": "%1 nie je priečinok",
+  "%1 points at nothing to duplicate": "%1 neukazuje na nič, čo by sa dalo duplikovať",
   "%1 was deleted on disk.": "Súbor %1 bol z disku odstránený.",
   "%n matches": {
     "one": "%n zhoda",

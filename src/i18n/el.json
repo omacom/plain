@@ -2,6 +2,7 @@
   " copy": " αντίγραφο",
   " copy %1": " αντίγραφο %1",
   "%1 already exists here": "Το %1 υπάρχει ήδη εδώ",
+  "%1 can't be duplicated inside itself": "Δεν μπορεί να δημιουργηθεί αντίγραφο του %1 μέσα στο ίδιο",
   "%1 can't be read back to check it hasn't changed": "δεν είναι δυνατή η εκ νέου ανάγνωση του %1 για να ελεγχθεί ότι δεν άλλαξε",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Το αρχείο %1 άλλαξε στον δίσκο αφότου το ανοίξατε. Η αποθήκευση θα έγραφε πάνω από αυτές τις αλλαγές.",
   "%1 changed on disk.": "Το αρχείο %1 άλλαξε στον δίσκο.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "Το %1 δεν είναι αρχείο κειμένου UTF-8, οπότε ο Επεξεργαστής κειμένου δεν το άνοιξε.",
   "%1 isn't a file Text Editor can open.": "Το %1 δεν είναι αρχείο που μπορεί να ανοίξει ο Επεξεργαστής κειμένου.",
   "%1 isn't a folder": "Το %1 δεν είναι φάκελος",
+  "%1 points at nothing to duplicate": "Το %1 δείχνει στο τίποτα, οπότε δεν υπάρχει τίποτα για δημιουργία αντιγράφου",
   "%1 was deleted on disk.": "Το αρχείο %1 διαγράφηκε από τον δίσκο.",
   "%n matches": {
     "one": "%n αντιστοιχία",

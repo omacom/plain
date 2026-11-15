@@ -2,6 +2,7 @@
   " copy": " cóip",
   " copy %1": " cóip %1",
   "%1 already exists here": "Tá %1 ann anseo cheana",
+  "%1 can't be duplicated inside itself": "Ní féidir %1 a dhúbailt ann féin",
   "%1 can't be read back to check it hasn't changed": "ní féidir %1 a léamh arís lena dheimhniú nár athraigh sé",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Athraíodh %1 ar an diosca ó d'oscail tú é. Dá sábhálfá é, scríobhfaí thar na hathruithe sin.",
   "%1 changed on disk.": "Athraíodh %1 ar an diosca.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "Ní comhad téacs UTF-8 é %1, mar sin níor oscail Eagarthóir Téacs é.",
   "%1 isn't a file Text Editor can open.": "Ní comhad é %1 is féidir le hEagarthóir Téacs a oscailt.",
   "%1 isn't a folder": "Ní fillteán é %1",
+  "%1 points at nothing to duplicate": "Níl %1 ag pointeáil ar rud ar bith le dúbailt",
   "%1 was deleted on disk.": "Scriosadh %1 ón diosca.",
   "%n matches": {
     "one": "%n toradh",

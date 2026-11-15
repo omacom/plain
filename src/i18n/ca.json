@@ -2,6 +2,7 @@
   " copy": " còpia",
   " copy %1": " còpia %1",
   "%1 already exists here": "%1 ja existeix aquí",
+  "%1 can't be duplicated inside itself": "%1 no es pot duplicar dins de si mateix",
   "%1 can't be read back to check it hasn't changed": "%1 no es pot tornar a llegir per comprovar que no ha canviat",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "%1 ha canviat al disc des que el vau obrir. Si el deseu, se sobreescriuran aquests canvis.",
   "%1 changed on disk.": "%1 ha canviat al disc.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 no és un fitxer de text UTF-8, per això l'Editor de text no l'ha obert.",
   "%1 isn't a file Text Editor can open.": "%1 no és un fitxer que l'Editor de text pugui obrir.",
   "%1 isn't a folder": "%1 no és una carpeta",
+  "%1 points at nothing to duplicate": "%1 no apunta a res per duplicar",
   "%1 was deleted on disk.": "%1 s'ha suprimit del disc.",
   "%n matches": {
     "one": "%n coincidència",

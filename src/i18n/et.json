@@ -2,6 +2,7 @@
   " copy": " koopia",
   " copy %1": " koopia %1",
   "%1 already exists here": "%1 on siin juba olemas",
+  "%1 can't be duplicated inside itself": "%1 ei saa selle enda sisse dubleerida",
   "%1 can't be read back to check it hasn't changed": "faili %1 ei saa tagasi lugeda, et kontrollida, kas see on muutumata",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Fail %1 on pärast avamist kettal muutunud. Salvestamine kirjutaks need muudatused üle.",
   "%1 changed on disk.": "Fail %1 muutus kettal.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 pole UTF-8 tekstifail, seega Tekstiredaktor seda ei avanud.",
   "%1 isn't a file Text Editor can open.": "%1 pole fail, mida Tekstiredaktor saab avada.",
   "%1 isn't a folder": "%1 pole kaust",
+  "%1 points at nothing to duplicate": "%1 ei osuta millelegi, mida dubleerida",
   "%1 was deleted on disk.": "Fail %1 kustutati kettalt.",
   "%n matches": {
     "one": "%n vaste",

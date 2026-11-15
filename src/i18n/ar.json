@@ -2,6 +2,7 @@
   " copy": " نسخة",
   " copy %1": " نسخة %1",
   "%1 already exists here": "%1 موجود هنا بالفعل",
+  "%1 can't be duplicated inside itself": "لا يمكن تكرار %1 داخل نفسه",
   "%1 can't be read back to check it hasn't changed": "تعذّرت إعادة قراءة %1 للتحقق من أنه لم يتغيّر",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "تغيّر %1 على القرص منذ فتحته. الحفظ سيكتب فوق تلك التغييرات.",
   "%1 changed on disk.": "تغيّر %1 على القرص.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 ليس ملفًا نصيًا بترميز UTF-8، لذا لم يفتحه محرر النصوص.",
   "%1 isn't a file Text Editor can open.": "%1 ليس ملفًا يمكن لمحرر النصوص فتحه.",
   "%1 isn't a folder": "%1 ليس مجلدًا",
+  "%1 points at nothing to duplicate": "%1 يشير إلى لا شيء لتكراره",
   "%1 was deleted on disk.": "حُذف %1 من القرص.",
   "%n matches": {
     "zero": "%n تطابق",

@@ -2,6 +2,7 @@
   " copy": " nakala",
   " copy %1": " nakala %1",
   "%1 already exists here": "%1 tayari ipo hapa",
+  "%1 can't be duplicated inside itself": "%1 haiwezi kurudufishwa ndani yake yenyewe",
   "%1 can't be read back to check it hasn't changed": "%1 haiwezi kusomwa tena ili kuthibitisha kuwa haijabadilika",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "%1 imebadilika kwenye diski tangu ulipoifungua. Kuhifadhi kutaandika juu ya mabadiliko hayo.",
   "%1 changed on disk.": "%1 imebadilika kwenye diski.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 si faili ya maandishi ya UTF-8, kwa hivyo Kihariri cha Maandishi hakikuifungua.",
   "%1 isn't a file Text Editor can open.": "%1 si faili ambayo Kihariri cha Maandishi kinaweza kuifungua.",
   "%1 isn't a folder": "%1 si folda",
+  "%1 points at nothing to duplicate": "%1 haielekezi kwenye chochote cha kurudufisha",
   "%1 was deleted on disk.": "%1 imefutwa kwenye diski.",
   "%n matches": {
     "one": "Tokeo %n",

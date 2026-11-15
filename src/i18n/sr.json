@@ -2,6 +2,7 @@
   " copy": " копија",
   " copy %1": " копија %1",
   "%1 already exists here": "%1 већ постоји овде",
+  "%1 can't be duplicated inside itself": "%1 не може да се дуплира унутар самог себе",
   "%1 can't be read back to check it hasn't changed": "датотеку %1 није могуће поново прочитати ради провере да ли се променила",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Датотека %1 се променила на диску откад сте је отворили. Чување би преписало те измене.",
   "%1 changed on disk.": "Датотека %1 се променила на диску.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 није UTF-8 текстуална датотека, па је Уређивач текста није отворио.",
   "%1 isn't a file Text Editor can open.": "%1 није датотека коју Уређивач текста може да отвори.",
   "%1 isn't a folder": "%1 није фасцикла",
+  "%1 points at nothing to duplicate": "%1 не показује ни на шта што се може дуплирати",
   "%1 was deleted on disk.": "Датотека %1 је обрисана са диска.",
   "%n matches": {
     "one": "%n резултат",

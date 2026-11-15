@@ -2,6 +2,7 @@
   " copy": " kopio",
   " copy %1": " kopio %1",
   "%1 already exists here": "%1 on jo olemassa täällä",
+  "%1 can't be duplicated inside itself": "%1:tä ei voi monistaa sen itsensä sisään",
   "%1 can't be read back to check it hasn't changed": "tiedostoa %1 ei voi lukea uudelleen sen tarkistamiseksi, ettei se ole muuttunut",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Tiedosto %1 on muuttunut levyllä sen jälkeen, kun avasit sen. Tallentaminen korvaisi nämä muutokset.",
   "%1 changed on disk.": "Tiedosto %1 muuttui levyllä.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 ei ole UTF-8-tekstitiedosto, joten Tekstieditori ei avannut sitä.",
   "%1 isn't a file Text Editor can open.": "%1 ei ole tiedosto, jonka Tekstieditori voi avata.",
   "%1 isn't a folder": "%1 ei ole kansio",
+  "%1 points at nothing to duplicate": "%1 ei osoita mihinkään monistettavaan",
   "%1 was deleted on disk.": "Tiedosto %1 poistettiin levyltä.",
   "%n matches": {
     "one": "%n osuma",

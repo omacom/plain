@@ -2,6 +2,7 @@
   " copy": " копия",
   " copy %1": " копия %1",
   "%1 already exists here": "%1 уже существует здесь",
+  "%1 can't be duplicated inside itself": "%1 нельзя продублировать внутрь самого себя",
   "%1 can't be read back to check it hasn't changed": "не удаётся перечитать %1 и убедиться, что файл не изменился",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Файл %1 изменился на диске после того, как вы его открыли. Сохранение перезапишет эти изменения.",
   "%1 changed on disk.": "Файл %1 изменился на диске.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "Файл %1 не является текстовым файлом в UTF-8, поэтому Текстовый редактор не открыл его.",
   "%1 isn't a file Text Editor can open.": "Текстовый редактор не может открыть файл %1.",
   "%1 isn't a folder": "%1 не является папкой",
+  "%1 points at nothing to duplicate": "%1 ни на что не указывает, дублировать нечего",
   "%1 was deleted on disk.": "Файл %1 удалён с диска.",
   "%n matches": {
     "one": "%n совпадение",

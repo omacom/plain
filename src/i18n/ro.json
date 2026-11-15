@@ -2,6 +2,7 @@
   " copy": " copie",
   " copy %1": " copie %1",
   "%1 already exists here": "%1 există deja aici",
+  "%1 can't be duplicated inside itself": "%1 nu se poate duplica în interiorul său",
   "%1 can't be read back to check it hasn't changed": "%1 nu poate fi recitit pentru a verifica dacă nu s-a schimbat",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "%1 s-a modificat pe disc de când l-ați deschis. Salvarea ar suprascrie acele modificări.",
   "%1 changed on disk.": "%1 s-a modificat pe disc.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 nu este un fișier text UTF-8, așa că Editor de text nu l-a deschis.",
   "%1 isn't a file Text Editor can open.": "%1 nu este un fișier pe care Editor de text îl poate deschide.",
   "%1 isn't a folder": "%1 nu este un dosar",
+  "%1 points at nothing to duplicate": "%1 nu indică spre nimic de duplicat",
   "%1 was deleted on disk.": "%1 a fost șters de pe disc.",
   "%n matches": {
     "one": "%n potrivire",

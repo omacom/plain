@@ -2,6 +2,7 @@
   " copy": " kopia",
   " copy %1": " kopia %1",
   "%1 already exists here": "%1 już tu istnieje",
+  "%1 can't be duplicated inside itself": "%1 nie może zostać powielone wewnątrz siebie",
   "%1 can't be read back to check it hasn't changed": "pliku %1 nie można ponownie odczytać, by sprawdzić, czy się nie zmienił",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Plik %1 zmienił się na dysku od czasu otwarcia. Zapisanie nadpisze te zmiany.",
   "%1 changed on disk.": "Plik %1 zmienił się na dysku.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 nie jest plikiem tekstowym UTF-8, więc Edytor tekstu go nie otworzył.",
   "%1 isn't a file Text Editor can open.": "%1 nie jest plikiem, który Edytor tekstu może otworzyć.",
   "%1 isn't a folder": "%1 nie jest folderem",
+  "%1 points at nothing to duplicate": "%1 nie wskazuje na nic do powielenia",
   "%1 was deleted on disk.": "Plik %1 został usunięty z dysku.",
   "%n matches": {
     "one": "%n wynik",

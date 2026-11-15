@@ -2,6 +2,7 @@
   " copy": " のコピー",
   " copy %1": " のコピー %1",
   "%1 already exists here": "%1はすでにここに存在します",
+  "%1 can't be duplicated inside itself": "%1をその内部に複製できません",
   "%1 can't be read back to check it hasn't changed": "%1を読み戻せないため、変更されていないか確認できません",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "%1は開いた後にディスク上で変更されました。保存するとその変更が上書きされます。",
   "%1 changed on disk.": "%1はディスク上で変更されました。",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1はUTF-8のテキストファイルではないため、テキストエディターでは開きませんでした。",
   "%1 isn't a file Text Editor can open.": "%1はテキストエディターで開けるファイルではありません。",
   "%1 isn't a folder": "%1はフォルダーではありません",
+  "%1 points at nothing to duplicate": "%1は複製対象を指していません",
   "%1 was deleted on disk.": "%1はディスク上で削除されました。",
   "%n matches": {
     "other": "%n件一致"

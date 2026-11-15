@@ -2,6 +2,7 @@
   " copy": " afrit",
   " copy %1": " afrit %1",
   "%1 already exists here": "%1 er þegar til hér",
+  "%1 can't be duplicated inside itself": "Ekki er hægt að afrita %1 inn í það sjálft",
   "%1 can't be read back to check it hasn't changed": "ekki er hægt að lesa %1 aftur til að staðfesta að ekkert hafi breyst",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "%1 hefur breyst á diski síðan þú opnaðir skrána. Ef þú vistar verður skrifað yfir þær breytingar.",
   "%1 changed on disk.": "%1 breyttist á diski.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 er ekki UTF-8 textaskrá, svo Textaritill opnaði hana ekki.",
   "%1 isn't a file Text Editor can open.": "%1 er ekki skrá sem Textaritill getur opnað.",
   "%1 isn't a folder": "%1 er ekki mappa",
+  "%1 points at nothing to duplicate": "%1 vísar á ekkert sem hægt er að afrita",
   "%1 was deleted on disk.": "%1 var eytt af diski.",
   "%n matches": {
     "one": "%n niðurstaða",

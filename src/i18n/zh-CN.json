@@ -2,6 +2,7 @@
   " copy": " 副本",
   " copy %1": " 副本 %1",
   "%1 already exists here": "此处已存在 %1",
+  "%1 can't be duplicated inside itself": "%1 无法在其自身内部创建副本",
   "%1 can't be read back to check it hasn't changed": "无法回读 %1 以确认其未被更改",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "打开后，%1 已在磁盘上被更改。保存将覆盖这些更改。",
   "%1 changed on disk.": "%1 已在磁盘上被更改。",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 不是 UTF-8 文本文件，因此文本编辑器未打开它。",
   "%1 isn't a file Text Editor can open.": "%1 不是文本编辑器能打开的文件。",
   "%1 isn't a folder": "%1 不是文件夹",
+  "%1 points at nothing to duplicate": "%1 未指向任何内容，无法创建副本",
   "%1 was deleted on disk.": "%1 已从磁盘上删除。",
   "%n matches": {
     "other": "%n 个匹配项"

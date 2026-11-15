@@ -2,6 +2,7 @@
   " copy": " kopya",
   " copy %1": " kopya %1",
   "%1 already exists here": "Narito na ang %1",
+  "%1 can't be duplicated inside itself": "Hindi maaaring doblehin ang %1 sa loob mismo nito",
   "%1 can't be read back to check it hasn't changed": "hindi mabasa muli ang %1 para matiyak na hindi ito nagbago",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Nagbago ang %1 sa disk mula nang buksan mo ito. Mapapatungan ng pag-save ang mga pagbabagong iyon.",
   "%1 changed on disk.": "Nagbago ang %1 sa disk.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "Hindi isang UTF-8 na text file ang %1, kaya hindi ito binuksan ng Editor ng Teksto.",
   "%1 isn't a file Text Editor can open.": "Hindi isang file na mabubuksan ng Editor ng Teksto ang %1.",
   "%1 isn't a folder": "Hindi isang folder ang %1",
+  "%1 points at nothing to duplicate": "Walang tinuturo ang %1 na maaaring doblehin",
   "%1 was deleted on disk.": "Na-delete ang %1 sa disk.",
   "%n matches": {
     "one": "%n tugma",

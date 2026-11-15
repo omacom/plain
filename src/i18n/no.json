@@ -2,6 +2,7 @@
   " copy": " kopi",
   " copy %1": " kopi %1",
   "%1 already exists here": "%1 finnes allerede her",
+  "%1 can't be duplicated inside itself": "%1 kan ikke dupliseres inni seg selv",
   "%1 can't be read back to check it hasn't changed": "%1 kan ikke leses inn igjen for å kontrollere at den er uendret",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "%1 er endret på disken siden du åpnet den. Hvis du lagrer, blir disse endringene overskrevet.",
   "%1 changed on disk.": "%1 er endret på disken.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 er ikke en UTF-8-tekstfil, så Tekstredigering åpnet den ikke.",
   "%1 isn't a file Text Editor can open.": "%1 er ikke en fil Tekstredigering kan åpne.",
   "%1 isn't a folder": "%1 er ikke en mappe",
+  "%1 points at nothing to duplicate": "%1 peker til ingenting å duplisere",
   "%1 was deleted on disk.": "%1 er slettet fra disken.",
   "%n matches": {
     "one": "%n treff",

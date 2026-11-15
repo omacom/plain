@@ -2,6 +2,7 @@
   " copy": " kopija",
   " copy %1": " kopija %1",
   "%1 already exists here": "%1 šeit jau pastāv",
+  "%1 can't be duplicated inside itself": "Nevar dublēt %1 pašā sevī",
   "%1 can't be read back to check it hasn't changed": "failu %1 nevar atkārtoti nolasīt, lai pārbaudītu, vai tas nav mainījies",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Fails %1 kopš atvēršanas diskā ir mainīts. Saglabājot šīs izmaiņas tiktu pārrakstītas.",
   "%1 changed on disk.": "Fails %1 diskā ir mainīts.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 nav UTF-8 teksta fails, tāpēc Teksta redaktors to neatvēra.",
   "%1 isn't a file Text Editor can open.": "%1 nav fails, ko Teksta redaktors var atvērt.",
   "%1 isn't a folder": "%1 nav mape",
+  "%1 points at nothing to duplicate": "%1 norāda uz neko, ko dublēt",
   "%1 was deleted on disk.": "Fails %1 diskā ir izdzēsts.",
   "%n matches": {
     "zero": "%n atbilstību",

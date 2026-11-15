@@ -2,6 +2,7 @@
   " copy": " עותק",
   " copy %1": " עותק %1",
   "%1 already exists here": "%1 כבר קיים כאן",
+  "%1 can't be duplicated inside itself": "לא ניתן לשכפל את %1 בתוך עצמו",
   "%1 can't be read back to check it hasn't changed": "לא ניתן לקרוא שוב את %1 כדי לוודא שלא השתנה",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "הקובץ %1 השתנה בדיסק מאז שפתחת אותו. שמירה תדרוס את השינויים האלה.",
   "%1 changed on disk.": "הקובץ %1 השתנה בדיסק.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 אינו קובץ טקסט ב־UTF-8, ולכן עורך טקסט לא פתח אותו.",
   "%1 isn't a file Text Editor can open.": "%1 אינו קובץ שעורך טקסט יכול לפתוח.",
   "%1 isn't a folder": "%1 אינו תיקייה",
+  "%1 points at nothing to duplicate": "%1 מצביע אל שום דבר שניתן לשכפל",
   "%1 was deleted on disk.": "הקובץ %1 נמחק מהדיסק.",
   "%n matches": {
     "one": "%n התאמה",

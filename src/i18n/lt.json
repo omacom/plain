@@ -2,6 +2,7 @@
   " copy": " kopija",
   " copy %1": " kopija %1",
   "%1 already exists here": "%1 čia jau egzistuoja",
+  "%1 can't be duplicated inside itself": "%1 negalima dubliuoti į savo vidų",
   "%1 can't be read back to check it hasn't changed": "nepavyksta iš naujo perskaityti %1 ir patikrinti, ar failas nepasikeitė",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Failas %1 pasikeitė diske po to, kai jį atvėrėte. Išsaugojus tie pakeitimai būtų perrašyti.",
   "%1 changed on disk.": "Failas %1 pasikeitė diske.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 nėra UTF-8 tekstinis failas, todėl Teksto redaktorius jo neatvėrė.",
   "%1 isn't a file Text Editor can open.": "%1 nėra failas, kurį Teksto redaktorius gali atverti.",
   "%1 isn't a folder": "%1 nėra aplankas",
+  "%1 points at nothing to duplicate": "%1 nerodo į nieką, ką galima dubliuoti",
   "%1 was deleted on disk.": "Failas %1 ištrintas iš disko.",
   "%n matches": {
     "one": "%n atitikmuo",

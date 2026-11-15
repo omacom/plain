@@ -2,6 +2,7 @@
   " copy": " کپی",
   " copy %1": " کپی %1",
   "%1 already exists here": "%1 از قبل اینجا وجود دارد",
+  "%1 can't be duplicated inside itself": "%1 نمی‌تواند درون خودش تکثیر شود",
   "%1 can't be read back to check it hasn't changed": "خواندن دوبارهٔ %1 برای اطمینان از تغییرنکردنش ممکن نیست",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "فایل %1 از وقتی آن را باز کردید روی دیسک تغییر کرده است. ذخیره کردن، آن تغییرات را بازنویسی می‌کند.",
   "%1 changed on disk.": "فایل %1 روی دیسک تغییر کرد.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 فایل متنی UTF-8 نیست، پس ویرایشگر متن آن را باز نکرد.",
   "%1 isn't a file Text Editor can open.": "%1 فایلی نیست که ویرایشگر متن بتواند آن را باز کند.",
   "%1 isn't a folder": "%1 پوشه نیست",
+  "%1 points at nothing to duplicate": "%1 به چیزی برای تکثیر اشاره نمی‌کند",
   "%1 was deleted on disk.": "فایل %1 از روی دیسک حذف شد.",
   "%n matches": {
     "one": "%n مورد",

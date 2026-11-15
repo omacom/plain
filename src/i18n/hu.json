@@ -2,6 +2,7 @@
   " copy": " másolat",
   " copy %1": " másolat %1",
   "%1 already exists here": "%1 már létezik itt",
+  "%1 can't be duplicated inside itself": "A(z) %1 nem duplikálható önmagába",
   "%1 can't be read back to check it hasn't changed": "a(z) %1 nem olvasható vissza, így nem ellenőrizhető, hogy változatlan-e",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "A(z) %1 fájl a megnyitása óta megváltozott a lemezen. A mentés felülírná ezeket a változásokat.",
   "%1 changed on disk.": "A(z) %1 fájl megváltozott a lemezen.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "A(z) %1 nem UTF-8 szövegfájl, ezért a Szövegszerkesztő nem nyitotta meg.",
   "%1 isn't a file Text Editor can open.": "A(z) %1 nem olyan fájl, amelyet a Szövegszerkesztő meg tud nyitni.",
   "%1 isn't a folder": "%1 nem mappa",
+  "%1 points at nothing to duplicate": "A(z) %1 semmire sem mutat, így nincs mit duplikálni",
   "%1 was deleted on disk.": "A(z) %1 fájlt törölték a lemezről.",
   "%n matches": {
     "one": "%n találat",

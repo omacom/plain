@@ -2,6 +2,7 @@
   " copy": " копія",
   " copy %1": " копія %1",
   "%1 already exists here": "%1 вже існує тут",
+  "%1 can't be duplicated inside itself": "%1 не можна дублювати всередину себе",
   "%1 can't be read back to check it hasn't changed": "не вдається повторно прочитати %1 і переконатися, що файл не змінився",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "Файл %1 змінився на диску відтоді, як ви його відкрили. Збереження перезапише ці зміни.",
   "%1 changed on disk.": "Файл %1 змінився на диску.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 не є текстовим файлом UTF-8, тому Текстовий редактор його не відкрив.",
   "%1 isn't a file Text Editor can open.": "%1 не є файлом, який Текстовий редактор може відкрити.",
   "%1 isn't a folder": "%1 не є текою",
+  "%1 points at nothing to duplicate": "%1 ні на що не вказує, тож немає що дублювати",
   "%1 was deleted on disk.": "Файл %1 видалено з диска.",
   "%n matches": {
     "one": "%n збіг",

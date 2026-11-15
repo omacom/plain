@@ -2,6 +2,7 @@
   " copy": " kopie",
   " copy %1": " kopie %1",
   "%1 already exists here": "%1 bestaat hier al",
+  "%1 can't be duplicated inside itself": "%1 kan niet in zichzelf worden gedupliceerd",
   "%1 can't be read back to check it hasn't changed": "%1 kan niet opnieuw worden gelezen om te controleren of het ongewijzigd is",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "%1 is op schijf gewijzigd sinds je het opende. Opslaan zou die wijzigingen overschrijven.",
   "%1 changed on disk.": "%1 is op schijf gewijzigd.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 is geen UTF-8-tekstbestand, dus Teksteditor heeft het niet geopend.",
   "%1 isn't a file Text Editor can open.": "%1 is geen bestand dat Teksteditor kan openen.",
   "%1 isn't a folder": "%1 is geen map",
+  "%1 points at nothing to duplicate": "%1 verwijst naar niets om te dupliceren",
   "%1 was deleted on disk.": "%1 is op schijf verwijderd.",
   "%n matches": {
     "one": "%n overeenkomst",

@@ -2,6 +2,7 @@
   " copy": " පිටපත",
   " copy %1": " පිටපත %1",
   "%1 already exists here": "%1 මෙහි දැනටමත් තිබේ",
+  "%1 can't be duplicated inside itself": "%1 එය තුළම අනුපිටපත් කළ නොහැක",
   "%1 can't be read back to check it hasn't changed": "%1 වෙනස් නොවූ බව තහවුරු කිරීමට එය නැවත කියවිය නොහැක",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "ඔබ විවෘත කළ පසු %1 තැටියේ වෙනස් වී ඇත. සුරැකුවහොත් එම වෙනස්කම් මත උඩින් ලියැවේ.",
   "%1 changed on disk.": "%1 තැටියේ වෙනස් වී ඇත.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 UTF-8 පෙළ ගොනුවක් නොවන බැවින් පෙළ සංස්කාරකය එය විවෘත කළේ නැත.",
   "%1 isn't a file Text Editor can open.": "%1 පෙළ සංස්කාරකයට විවෘත කළ හැකි ගොනුවක් නොවේ.",
   "%1 isn't a folder": "%1 ෆෝල්ඩරයක් නොවේ",
+  "%1 points at nothing to duplicate": "%1 අනුපිටපත් කිරීමට කිසිවකට යොමු නොවේ",
   "%1 was deleted on disk.": "%1 තැටියෙන් මකා දමා ඇත.",
   "%n matches": {
     "one": "ගැළපීම් %n",

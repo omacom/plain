@@ -2,6 +2,7 @@
   " copy": " நகல்",
   " copy %1": " நகல் %1",
   "%1 already exists here": "%1 இங்கே ஏற்கனவே உள்ளது",
+  "%1 can't be duplicated inside itself": "%1 ஐ அதற்குள்ளேயே நகலாக்க முடியாது",
   "%1 can't be read back to check it hasn't changed": "%1 மாறவில்லை என்பதைச் சரிபார்க்க அதை மீண்டும் படிக்க முடியவில்லை",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "நீங்கள் திறந்த பிறகு %1 வட்டில் மாற்றப்பட்டுள்ளது. சேமித்தால் அந்த மாற்றங்கள் மேலெழுதப்படும்.",
   "%1 changed on disk.": "%1 வட்டில் மாற்றப்பட்டுள்ளது.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 UTF-8 உரைக் கோப்பு அல்ல, எனவே உரை திருத்தி அதைத் திறக்கவில்லை.",
   "%1 isn't a file Text Editor can open.": "%1 என்பது உரை திருத்தி திறக்க முடியாத கோப்பு.",
   "%1 isn't a folder": "%1 ஒரு கோப்புறை அல்ல",
+  "%1 points at nothing to duplicate": "%1 நகலாக்க எதையும் சுட்டவில்லை",
   "%1 was deleted on disk.": "%1 வட்டிலிருந்து நீக்கப்பட்டது.",
   "%n matches": {
     "one": "%n பொருத்தம்",

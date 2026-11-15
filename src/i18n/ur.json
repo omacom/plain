@@ -2,6 +2,7 @@
   " copy": " نقل",
   " copy %1": " نقل %1",
   "%1 already exists here": "%1 یہاں پہلے سے موجود ہے",
+  "%1 can't be duplicated inside itself": "%1 کی نقل اسی کے اندر نہیں بنائی جا سکتی",
   "%1 can't be read back to check it hasn't changed": "%1 کو دوبارہ پڑھ کر تصدیق نہیں ہو سکی کہ یہ تبدیل نہیں ہوئی",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "فائل %1 آپ کے کھولنے کے بعد ڈسک پر تبدیل ہو گئی ہے۔ محفوظ کرنے سے وہ تبدیلیاں مٹ جائیں گی۔",
   "%1 changed on disk.": "فائل %1 ڈسک پر تبدیل ہو گئی۔",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 UTF-8 متنی فائل نہیں ہے، اس لیے متن ایڈیٹر نے اسے نہیں کھولا۔",
   "%1 isn't a file Text Editor can open.": "%1 ایسی فائل نہیں ہے جسے متن ایڈیٹر کھول سکے۔",
   "%1 isn't a folder": "%1 کوئی فولڈر نہیں ہے",
+  "%1 points at nothing to duplicate": "%1 نقل بنانے کے لیے کسی چیز کی طرف اشارہ نہیں کرتا",
   "%1 was deleted on disk.": "فائل %1 ڈسک سے حذف ہو گئی۔",
   "%n matches": {
     "one": "%n مماثلت",

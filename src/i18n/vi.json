@@ -2,6 +2,7 @@
   " copy": " bản sao",
   " copy %1": " bản sao %1",
   "%1 already exists here": "%1 đã tồn tại ở đây",
+  "%1 can't be duplicated inside itself": "Không thể nhân bản %1 vào bên trong chính nó",
   "%1 can't be read back to check it hasn't changed": "không thể đọc lại %1 để kiểm tra xem nó có bị thay đổi không",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "%1 đã bị thay đổi trên đĩa kể từ khi bạn mở. Lưu sẽ ghi đè lên những thay đổi đó.",
   "%1 changed on disk.": "%1 đã bị thay đổi trên đĩa.",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 không phải tệp văn bản UTF-8 nên Trình soạn thảo văn bản đã không mở tệp này.",
   "%1 isn't a file Text Editor can open.": "%1 không phải tệp Trình soạn thảo văn bản có thể mở.",
   "%1 isn't a folder": "%1 không phải là thư mục",
+  "%1 points at nothing to duplicate": "%1 không trỏ đến thứ gì để nhân bản",
   "%1 was deleted on disk.": "%1 đã bị xóa trên đĩa.",
   "%n matches": {
     "other": "%n kết quả khớp"

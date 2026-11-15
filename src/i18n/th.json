@@ -2,6 +2,7 @@
   " copy": " สำเนา",
   " copy %1": " สำเนา %1",
   "%1 already exists here": "%1 มีอยู่ที่นี่แล้ว",
+  "%1 can't be duplicated inside itself": "ทำสำเนา %1 ไว้ภายในตัวมันเองไม่ได้",
   "%1 can't be read back to check it hasn't changed": "ไม่สามารถอ่าน %1 ซ้ำเพื่อตรวจสอบว่าไม่มีการเปลี่ยนแปลง",
   "%1 changed on disk since you opened it. Saving would overwrite those changes.": "%1 ถูกเปลี่ยนแปลงบนดิสก์หลังจากที่คุณเปิด การบันทึกจะเขียนทับการเปลี่ยนแปลงเหล่านั้น",
   "%1 changed on disk.": "%1 ถูกเปลี่ยนแปลงบนดิสก์",
@@ -13,6 +14,7 @@
   "%1 isn't a UTF-8 text file, so Text Editor didn't open it.": "%1 ไม่ใช่ไฟล์ข้อความ UTF-8 โปรแกรมแก้ไขข้อความจึงไม่ได้เปิดไฟล์นี้",
   "%1 isn't a file Text Editor can open.": "%1 ไม่ใช่ไฟล์ที่โปรแกรมแก้ไขข้อความเปิดได้",
   "%1 isn't a folder": "%1 ไม่ใช่โฟลเดอร์",
+  "%1 points at nothing to duplicate": "%1 ชี้ไปยังสิ่งที่ไม่มีอยู่ จึงไม่มีอะไรให้ทำสำเนา",
   "%1 was deleted on disk.": "%1 ถูกลบออกจากดิสก์แล้ว",
   "%n matches": {
     "other": "พบ %n รายการ"
