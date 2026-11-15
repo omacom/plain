@@ -24,6 +24,7 @@
   "<u>S</u>ave": "บันทึก (<u>S</u>)",
   "A folder can't go inside itself": "โฟลเดอร์เข้าไปอยู่ข้างในตัวเองไม่ได้",
   "A name can't be . or .. or have a / in it": "ชื่อเป็น . หรือ .. ไม่ได้ และมี / อยู่ในชื่อไม่ได้",
+  "A screenful up or down": "เลื่อนขึ้นหรือลงหนึ่งหน้าจอ",
   "Between files and text": "ระหว่างไฟล์กับข้อความ",
   "Cancel": "ยกเลิก",
   "Close": "ปิด",

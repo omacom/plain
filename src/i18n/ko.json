@@ -24,6 +24,7 @@
   "<u>S</u>ave": "저장(<u>S</u>)",
   "A folder can't go inside itself": "폴더는 자기 안으로 이동할 수 없습니다",
   "A name can't be . or .. or have a / in it": "이름은 .이나 ..일 수 없으며 /를 포함할 수 없습니다",
+  "A screenful up or down": "한 화면 위로 또는 아래로",
   "Between files and text": "파일과 텍스트 간 전환",
   "Cancel": "취소",
   "Close": "닫기",

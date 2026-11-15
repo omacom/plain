@@ -27,6 +27,7 @@
   "<u>S</u>ave": "Зберегти (<u>S</u>)",
   "A folder can't go inside itself": "Тека не може бути всередині самої себе",
   "A name can't be . or .. or have a / in it": "Назва не може бути . або .. та містити /",
+  "A screenful up or down": "На цілий екран вгору або вниз",
   "Between files and text": "Між файлами та текстом",
   "Cancel": "Скасувати",
   "Close": "Закрити",

@@ -24,6 +24,7 @@
   "<u>S</u>ave": "保存(<u>S</u>)",
   "A folder can't go inside itself": "フォルダーをそれ自身の中へは移動できません",
   "A name can't be . or .. or have a / in it": "名前を . または .. にしたり、/ を含めたりすることはできません",
+  "A screenful up or down": "1画面分上下に移動",
   "Between files and text": "ファイルとテキスト間を移動",
   "Cancel": "キャンセル",
   "Close": "閉じる",

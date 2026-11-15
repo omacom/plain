@@ -29,6 +29,7 @@
   "<u>S</u>ave": "حفظ (<u>S</u>)",
   "A folder can't go inside itself": "لا يمكن وضع مجلد داخل نفسه",
   "A name can't be . or .. or have a / in it": "لا يمكن أن يكون الاسم . أو .. أو أن يحتوي على /",
+  "A screenful up or down": "شاشة كاملة لأعلى أو لأسفل",
   "Between files and text": "بين الملفات والنص",
   "Cancel": "إلغاء",
   "Close": "إغلاق",
