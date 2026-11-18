@@ -69,7 +69,16 @@ Item {
         property int line: 1
         function onAboutToReload() { line = editing.lineOf(area.cursorPosition) }
         function onReloaded() { area.cursorPosition = editing.positionOfLine(line) }
-        function onFileChanged() { view.updateVisibleLines() }
+        function onFileChanged() {
+            // Qt's TextEdit puts the cursor at the end as it turns editable,
+            // as a file it refused to open opens anyway: it stays put instead.
+            if (area.readOnly === doc.editable) {
+                const position = area.cursorPosition
+                area.readOnly = !doc.editable
+                area.cursorPosition = position
+            }
+            view.updateVisibleLines()
+        }
     }
 
     Rectangle {
@@ -131,7 +140,7 @@ Item {
             id: area
             textFormat: TextEdit.PlainText
             wrapMode: view.wrap ? TextEdit.Wrap : TextEdit.NoWrap
-            readOnly: !doc.editable
+            // readOnly follows doc.editable through onFileChanged above.
             persistentSelection: true
             selectByMouse: true
             font.family: "monospace"

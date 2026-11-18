@@ -1655,6 +1655,24 @@ private slots:
         QCOMPARE(area->property("cursorPosition").toInt(), 8);
     }
 
+    // A file too large to open, opened anyway, starts at its top: turning
+    // editable doesn't send the cursor to the end.
+    void openingALargeFileAnywayStartsAtTheTop()
+    {
+        PlainWindow plain;
+        QByteArray big;
+        while (big.size() <= Document::LargeFileBytes)
+            big += "some = setting\n";
+        write(plain.path("root/big.conf"), big);
+        QVERIFY(plain.load("root/big.conf", ""));
+        QCOMPARE(plain.doc.problem(), QString("TooLarge"));
+        plain.doc.openAnyway();
+        auto *area = qobject_cast<QQuickItem *>(plain.item("editorView")->property("area").value<QObject *>());
+        QVERIFY(!area->property("readOnly").toBool());
+        QCOMPARE(area->property("cursorPosition").toInt(), 0);
+        QTRY_COMPARE(plain.item("editorFlick")->property("contentY").toReal(), 0);
+    }
+
     // F3 and Shift+F3 step through matches.
     void f3FindsTheNextMatch()
     {
