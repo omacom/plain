@@ -29,10 +29,6 @@
 namespace {
 const QByteArray Bom("\xEF\xBB\xBF");
 
-QString cleaned(const QString &path) {
-    return QDir::cleanPath(QFileInfo(path).absoluteFilePath());
-}
-
 QString shortenHome(const QString &path) {
     if (path.isEmpty())
         return {};
@@ -216,6 +212,41 @@ QByteArray Document::stamp(const QString &path) {
          + QByteArray::number(qlonglong(st.st_mtim.tv_nsec));
 }
 
+// Absolute and free of `.`, `..` and `//`, without changing which file the
+// user named: `..` after a directory symlink follows the link first (as the
+// kernel does), and `..` after a missing or non-directory entry stays put so
+// open() refuses it.
+QString Document::cleanPath(const QString &path) {
+    // Make it absolute without QFileInfo::absoluteFilePath(), which calls
+    // QDir::cleanPath() and collapses `..` lexically across directory symlinks.
+    const QString abs = QDir::isAbsolutePath(path) ? path : QDir::currentPath() + "/" + path;
+    const QStringList parts = abs.split('/', Qt::SkipEmptyParts);
+    if (!parts.contains(".."))
+        return QDir::cleanPath(abs);
+    QStringList out;
+    for (const QString &part : parts) {
+        if (part == ".")
+            continue;
+        if (part == "..") {
+            const QString current = "/" + out.join('/');
+            const QFileInfo info(current);
+            if (!info.isDir())
+                return abs;
+            if (info.isSymLink()) {
+                const QString resolved = info.canonicalFilePath();
+                if (resolved.isEmpty())
+                    return abs;
+                out = resolved.split('/', Qt::SkipEmptyParts);
+            }
+            if (!out.isEmpty())
+                out.removeLast();
+        } else {
+            out << part;
+        }
+    }
+    return "/" + out.join('/');
+}
+
 QString Document::displayPath() const {
     return shortenHome(m_path);
 }
@@ -258,7 +289,7 @@ bool Document::openUrl(const QUrl &url) {
 
 bool Document::open(const QString &path) {
     // Absolute, but not canonical: the user opened the link, not its target.
-    m_path = cleaned(path);
+    m_path = cleanPath(path);
     m_allowLarge = false;
     return load(false);
 }
@@ -300,7 +331,7 @@ void Document::relocate(const QString &from, const QString &to) {
             return after + path.mid(before.size());
         return QString();
     };
-    const QString path = moved(m_path, cleaned(from), cleaned(to));
+    const QString path = moved(m_path, cleanPath(from), cleanPath(to));
     if (path.isEmpty())
         return;
     m_path = path;
@@ -403,7 +434,7 @@ bool Document::load(bool reload) {
         // A new file, created on first save. A dangling link saves to where
         // it points.
         const QString target = info.isSymLink() ? info.symLinkTarget() : m_path;
-        if (!QFileInfo(QFileInfo(target).absolutePath()).isDir())
+        if (!QFileInfo(QFileInfo(target).path()).isDir())
             return refuse(Problem::NotFound);
         m_target = target;
         forgetDisk();
@@ -576,7 +607,7 @@ bool Document::saveAsUrl(const QUrl &url) {
     // refused file itself) with nothing.
     if (!url.isLocalFile() || !m_document || (!m_editable && !m_locked))
         return false;
-    const QString path = cleaned(url.toLocalFile());
+    const QString path = cleanPath(url.toLocalFile());
     const QFileInfo info(path);
     const QString target = info.exists() ? info.canonicalFilePath() : info.isSymLink() ? info.symLinkTarget() : path;
     const bool inPlace = info.exists() && !unsafeForRename(target).isEmpty();

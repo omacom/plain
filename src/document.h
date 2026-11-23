@@ -64,6 +64,7 @@ public:
     static QString detectIndent(const QString &text);
     static QByteArray hash(const QByteArray &bytes);
     static QByteArray stamp(const QString &path);
+    static QString cleanPath(const QString &path);
 
     explicit Document(QObject *parent = nullptr);
 

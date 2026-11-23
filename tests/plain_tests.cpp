@@ -1312,6 +1312,20 @@ private slots:
         QVERIFY(doc.saveAsUrl(QUrl::fromLocalFile(dir.path() + "/./c.conf")));
         QCOMPARE(doc.path(), cleanC);
         QCOMPARE(read(cleanC), QByteArray("a = 1\n"));
+
+        // `..` across a directory symlink resolves through the symlink first,
+        // matching POSIX rather than lexically collapsing `link/..`.
+        QDir(dir.path()).mkpath("work");
+        QDir(dir.path()).mkpath("data/sub");
+        write(dir.filePath("work/target.conf"), "wrong\n");
+        write(dir.filePath("data/target.conf"), "right\n");
+        QVERIFY(QFile::link(dir.filePath("data/sub"), dir.filePath("work/link")));
+        QVERIFY(doc.open(dir.path() + "/work/link/../target.conf"));
+        QCOMPARE(doc.path(), QFileInfo(dir.filePath("data/target.conf")).canonicalFilePath());
+        QCOMPARE(text.toPlainText(), QString("right\n"));
+        // `..` through a missing directory must not collapse into an existing file.
+        QVERIFY(!doc.open(dir.path() + "/work/missing/../target.conf"));
+        QCOMPARE(doc.problem(), QString("NotFound"));
     }
 
     void rehighlightsIdenticalTextWithNbsp()
