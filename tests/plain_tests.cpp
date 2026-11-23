@@ -1857,6 +1857,104 @@ private slots:
         QTRY_VERIFY(plain.sidebar()->property("treeFocused").toBool());
     }
 
+    void modalDialogsBlockWindowShortcuts()
+    {
+        PlainWindow plain;
+        QVERIFY(plain.load("root/b.conf", ""));
+        plain.key(Qt::Key_B, Qt::ControlModifier);
+        QTRY_VERIFY(plain.sidebar()->property("treeFocused").toBool());
+        plain.key(Qt::Key_N, Qt::ControlModifier);
+        QTRY_VERIFY(plain.item("namePrompt")->property("opened").toBool());
+
+        // Window shortcuts stay off while a modal dialog is up.
+        plain.key(Qt::Key_F, Qt::ControlModifier);
+        QVERIFY(!plain.item("findBar")->property("visible").toBool());
+        plain.key(Qt::Key_B, Qt::ControlModifier);
+        QVERIFY(plain.window->property("sidebarVisible").toBool());
+        plain.key(Qt::Key_Slash, Qt::ControlModifier);
+        QCOMPARE(plain.doc.textDocument()->toPlainText(), QString("b\n"));
+        plain.key(Qt::Key_F1);
+        QVERIFY(!plain.item("help")->property("visible").toBool());
+
+        plain.key(Qt::Key_Escape);
+        QTRY_VERIFY(!plain.item("namePrompt")->property("opened").toBool());
+    }
+
+    void cancellingUnsavedAfterCtrlNReturnsFocusToSidebar()
+    {
+        PlainWindow plain;
+        QVERIFY(plain.load("root/b.conf", ""));
+        plain.type("x");
+        QVERIFY(plain.doc.modified());
+
+        plain.key(Qt::Key_B, Qt::ControlModifier);
+        QTRY_VERIFY(plain.sidebar()->property("treeFocused").toBool());
+        plain.key(Qt::Key_N, Qt::ControlModifier);
+        QTRY_VERIFY(plain.item("namePrompt")->property("opened").toBool());
+        plain.type("fresh.conf");
+        plain.key(Qt::Key_Return);
+        QTRY_VERIFY(plain.item("unsaved")->property("opened").toBool());
+
+        plain.key(Qt::Key_Escape);
+        QTRY_VERIFY(!plain.item("unsaved")->property("opened").toBool());
+        QTRY_VERIFY(plain.sidebar()->property("treeFocused").toBool());
+    }
+
+    void findBarClearsReplacedHintOnReopenAndFileChange()
+    {
+        PlainWindow plain;
+        write(plain.path("root/r.conf"), "foo one foo\n");
+        QVERIFY(plain.load("root/r.conf", ""));
+        QObject *bar = plain.item("findBar");
+
+        plain.key(Qt::Key_H, Qt::ControlModifier);
+        QVERIFY(bar->property("visible").toBool());
+        plain.type("foo");
+        plain.key(Qt::Key_Tab);
+        plain.type("bar");
+        plain.key(Qt::Key_Return, Qt::ControlModifier);
+        QVERIFY(!bar->property("replaced").toString().isEmpty());
+
+        // Reopening the bar clears the previous Replace All count.
+        plain.key(Qt::Key_Escape);
+        plain.key(Qt::Key_F, Qt::ControlModifier);
+        QCOMPARE(bar->property("replaced").toString(), QString());
+
+        // Opening another file clears it too.
+        bar->setProperty("replaced", "Replaced 1");
+        plain.doc.open(plain.path("root/a.conf"));
+        QCOMPARE(bar->property("replaced").toString(), QString());
+    }
+
+    void ctrlShiftTabDoesNotOutdent()
+    {
+        PlainWindow plain;
+        write(plain.path("root/i.conf"), "    a = 1\n");
+        QVERIFY(plain.load("root/i.conf", ""));
+        QTRY_VERIFY(plain.editorFocused());
+
+        plain.key(Qt::Key_Backtab, Qt::ControlModifier | Qt::ShiftModifier);
+        QCOMPARE(plain.doc.textDocument()->toPlainText(), QString("    a = 1\n"));
+        plain.key(Qt::Key_Backtab, Qt::ShiftModifier);
+        QCOMPARE(plain.doc.textDocument()->toPlainText(), QString("a = 1\n"));
+    }
+
+    void sidebarEmptyKeysKeepNoSelection()
+    {
+        PlainWindow plain;
+        QDir(plain.path("")).mkpath("empty");
+        QVERIFY(plain.load("", "empty"));
+        QTRY_VERIFY(plain.sidebar()->property("treeFocused").toBool());
+        QObject *list = plain.item("fileList");
+        QCOMPARE(list->property("currentIndex").toInt(), -1);
+
+        plain.key(Qt::Key_Home);
+        plain.key(Qt::Key_End);
+        plain.key(Qt::Key_PageDown);
+        plain.key(Qt::Key_PageUp);
+        QCOMPARE(list->property("currentIndex").toInt(), -1);
+    }
+
     void closesToAnEmptyDocument()
     {
         QTemporaryDir dir;
