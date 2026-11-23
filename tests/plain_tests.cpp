@@ -2031,6 +2031,31 @@ private slots:
         QCOMPARE(editing.positionOfLine(2), 6);
     }
 
+    void matchCountMatchesQTextDocumentFind()
+    {
+        QTextDocument text;
+        text.setPlainText(QStringLiteral("aaa\nFoo foo\na\u00A0b\nend"));
+        Document doc;
+        doc.attachDocument(&text);
+        Editing editing(&doc);
+
+        auto verify = [&](const QString &needle, bool caseSensitive) {
+            int expected = 0;
+            QTextCursor cursor(&text);
+            const auto flags = caseSensitive ? QTextDocument::FindCaseSensitively : QTextDocument::FindFlags();
+            while (!(cursor = text.find(needle, cursor, flags)).isNull())
+                ++expected;
+            QCOMPARE(editing.matchCount(needle, caseSensitive), expected);
+        };
+        verify("aa", false);
+        verify("foo", false);
+        verify("foo", true);
+        verify("a b", false);
+        verify(QStringLiteral("a\u00A0b"), false);
+        verify("foo\na", false);
+        verify("", false);
+    }
+
     // QML calls these from Ctrl+O and Ctrl+S; plain C++ methods it can't.
     // A portal that owns its name but never answers can't freeze Plain:
     // asking it, and asking again, return at once.
@@ -2154,6 +2179,21 @@ private slots:
         events->write("configreloaded>>\n");
         events->flush();
         QTRY_COMPARE_WITH_TIMEOUT(theme.radius(), 8, 3000);
+    }
+
+    // Startup asks hyprctl once, not twice in a row.
+    void themeAsksHyprctlOnceAtStartup()
+    {
+        QTemporaryDir dir, logDir;
+        const QString log = logDir.filePath("calls");
+        write(dir.filePath("hyprctl"),
+              "#!/bin/sh\necho x >> '" + QFile::encodeName(log) + "'\nsleep 0.05\necho '{\"int\": 6}'\n");
+        QFile::setPermissions(dir.filePath("hyprctl"), QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
+        QDir(dir.path()).mkpath("state");
+        Theme theme(dir.filePath("state"), nullptr, dir.filePath("hyprctl"), dir.filePath("missing.sock"));
+        QTRY_COMPARE(theme.radius(), 6);
+        QTest::qWait(200);
+        QCOMPARE(read(log).count('\n'), 1);
     }
 
     // The display panel's Text size: the user's override, else the theme's.
