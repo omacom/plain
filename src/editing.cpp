@@ -33,6 +33,13 @@ int leadingWhitespace(const QString &text) {
         ++i;
     return i;
 }
+
+int trimmedEnd(const QString &text) {
+    int end = int(text.size());
+    while (end > 0 && text.at(end - 1).isSpace())
+        --end;
+    return end;
+}
 }
 
 Editing::Editing(Document *document, QObject *parent) : QObject(parent), m_document(document) {}
@@ -89,9 +96,15 @@ void Editing::toggleComment(int start, int end) {
         const int indent = leadingWhitespace(text);
         column = qMin(column, indent);
         // In CSS, a line only starts with /* when an inline comment opens
-        // it; commented means wrapped whole.
-        if (!text.mid(indent).startsWith(prefix) || (!suffix.isEmpty() && !text.trimmed().endsWith("*/")))
+        // it, or ends with */ when another closes it; commented means one
+        // comment wraps the whole line.
+        if (!text.mid(indent).startsWith(prefix)) {
             allCommented = false;
+        } else if (!suffix.isEmpty()) {
+            const int last = trimmedEnd(text);
+            if (text.indexOf(QStringLiteral("*/"), indent + prefix.size()) != last - 2)
+                allCommented = false;
+        }
     }
 
     QTextCursor cursor(doc);
@@ -103,13 +116,16 @@ void Editing::toggleComment(int start, int end) {
             int length = prefix.size();
             if (at + length < text.size() && text.at(at + length) == ' ')
                 ++length;
-            if (!suffix.isEmpty() && text.endsWith("*/")) {
-                const int cut = text.endsWith(suffix) ? suffix.size() : 2;
-                cursor.setPosition(block.position() + text.size() - cut);
-                cursor.setPosition(block.position() + text.size(), QTextCursor::KeepAnchor);
+            if (!suffix.isEmpty()) {
+                const int last = trimmedEnd(text);
+                const int cut = last - (at + length) >= suffix.size()
+                                && QStringView(text).left(last).endsWith(suffix)
+                                ? int(suffix.size()) : 2;
+                cursor.setPosition(block.position() + last - cut);
+                cursor.setPosition(block.position() + last, QTextCursor::KeepAnchor);
                 cursor.removeSelectedText();
                 // The closings inside it, escaped when it was commented.
-                escapeClosings(cursor, block.position(), text, at + length, int(text.size()) - cut, true);
+                escapeClosings(cursor, block.position(), text, at + length, last - cut, true);
             }
             cursor.setPosition(block.position() + at);
             cursor.setPosition(block.position() + at + length, QTextCursor::KeepAnchor);
