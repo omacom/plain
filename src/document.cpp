@@ -60,6 +60,20 @@ QString groupName(gid_t gid) {
 }
 }
 
+// `from` as it was before the move, through any links in its folder.
+static QString canonicalBefore(const QString &from) {
+    const QFileInfo info(from);
+    const QString folder = QFileInfo(info.absolutePath()).canonicalFilePath();
+    return folder.isEmpty() ? QString() : QDir::cleanPath(folder + "/" + info.fileName());
+}
+
+// A file that isn't there yet, through any links in its folder: the path
+// canonicalFilePath() gives once a save has made it.
+static QString canonicalNew(const QString &path) {
+    const QString canonical = canonicalBefore(path);
+    return canonical.isEmpty() ? path : canonical;
+}
+
 Document::Document(QObject *parent) : QObject(parent) {
     // Editors and Omarchy's scripts replace files rather than writing into
     // them, which drops the watch; the debounce collapses the burst and
@@ -251,13 +265,6 @@ void Document::close() {
     emit modifiedChanged();
 }
 
-// `from` as it was before the move, through any links in its folder.
-static QString canonicalBefore(const QString &from) {
-    const QFileInfo info(from);
-    const QString folder = QFileInfo(info.absolutePath()).canonicalFilePath();
-    return folder.isEmpty() ? QString() : QDir::cleanPath(folder + "/" + info.fileName());
-}
-
 void Document::relocate(const QString &from, const QString &to) {
     if (m_path.isEmpty())
         return;
@@ -372,7 +379,7 @@ bool Document::load(bool reload) {
             return refuse(Problem::DeletedOnDisk);
         // A new file, created on first save. A dangling link saves to where
         // it points.
-        const QString target = info.isSymLink() ? info.symLinkTarget() : m_path;
+        const QString target = canonicalNew(info.isSymLink() ? info.symLinkTarget() : m_path);
         if (!QFileInfo(QFileInfo(target).absolutePath()).isDir())
             return refuse(Problem::NotFound);
         m_target = target;
@@ -459,7 +466,7 @@ QString Document::currentTarget() const {
     const QFileInfo info(m_path);
     if (info.exists())
         return info.canonicalFilePath();
-    return info.isSymLink() ? info.symLinkTarget() : m_path;
+    return canonicalNew(info.isSymLink() ? info.symLinkTarget() : m_path);
 }
 
 bool Document::save() {
@@ -547,7 +554,7 @@ bool Document::saveAsUrl(const QUrl &url) {
         return false;
     const QString path = QFileInfo(url.toLocalFile()).absoluteFilePath();
     const QFileInfo info(path);
-    const QString target = info.exists() ? info.canonicalFilePath() : info.isSymLink() ? info.symLinkTarget() : path;
+    const QString target = info.exists() ? info.canonicalFilePath() : canonicalNew(info.isSymLink() ? info.symLinkTarget() : path);
     const bool inPlace = info.exists() && !unsafeForRename(target).isEmpty();
     if (!write(target, inPlace))
         return false;

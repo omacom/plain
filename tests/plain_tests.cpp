@@ -471,6 +471,27 @@ private slots:
         QCOMPARE(read(one), QByteArray("1\n"));
     }
 
+    // A new file in a folder reached through a link (a dotfiles checkout
+    // linked into ~/.config) saves again after the save that made it.
+    void savesANewFileTwiceThroughALinkedFolder()
+    {
+        QTemporaryDir dir;
+        QDir(dir.path()).mkpath("dotfiles/hypr");
+        QVERIFY(QFile::link(dir.filePath("dotfiles/hypr"), dir.filePath("hypr")));
+        const QString path = dir.filePath("hypr/new.conf");
+
+        QTextDocument text;
+        Document doc;
+        doc.attachDocument(&text);
+        QVERIFY(doc.open(path));
+        append(&text, "a = 1\n");
+        QVERIFY(doc.save());
+        append(&text, "b = 2\n");
+        QVERIFY(doc.save());
+        QCOMPARE(doc.problem(), QString("None"));
+        QCOMPARE(read(dir.filePath("dotfiles/hypr/new.conf")), QByteArray("a = 1\nb = 2\n"));
+    }
+
     void neverSavesOverAnUnseenVersion()
     {
         QTemporaryDir dir;
