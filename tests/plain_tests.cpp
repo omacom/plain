@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
+#include <QDBusObjectPath>
 #include <QSemaphore>
 #include <QThread>
 #include <QLocalServer>
@@ -261,6 +262,49 @@ QStringList catalogProblems(const QString &folder) {
 }
 
 }
+
+class FakePortalRequest : public QObject {
+    Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.freedesktop.portal.Request")
+
+public:
+    bool closed = false;
+
+public slots:
+    void Close() { closed = true; }
+};
+
+class FakePortalChooser : public QObject {
+    Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.freedesktop.portal.FileChooser")
+
+public:
+    QVariantMap lastOptions;
+    QString lastRequestPath;
+
+    FakePortalChooser(QDBusConnection bus, QString clientService, FakePortalRequest *request, QObject *parent = nullptr)
+        : QObject(parent), m_bus(bus), m_clientService(std::move(clientService)), m_request(request) {}
+
+public slots:
+    QDBusObjectPath OpenFile(const QString &, const QString &, const QVariantMap &options) { return handle(options); }
+    QDBusObjectPath SaveFile(const QString &, const QString &, const QVariantMap &options) { return handle(options); }
+
+private:
+    QDBusObjectPath handle(const QVariantMap &options) {
+        lastOptions = options;
+        QString sender = m_clientService.mid(1);
+        sender.replace(QLatin1Char('.'), QLatin1Char('_'));
+        lastRequestPath = QStringLiteral("/org/freedesktop/portal/desktop/request/%1/%2")
+                              .arg(sender, options.value("handle_token").toString());
+        m_bus.unregisterObject(lastRequestPath);
+        m_bus.registerObject(lastRequestPath, m_request, QDBusConnection::ExportAllSlots);
+        return QDBusObjectPath(lastRequestPath);
+    }
+
+    QDBusConnection m_bus;
+    QString m_clientService;
+    FakePortalRequest *m_request;
+};
 
 class PlainTests : public QObject {
     Q_OBJECT
@@ -1244,6 +1288,88 @@ private slots:
         QVERIFY(!QFileInfo::exists(dir.filePath("x.lua")));
     }
 
+    void cleansOpenedAndRelocatedPaths()
+    {
+        QTemporaryDir dir;
+        QDir(dir.path()).mkpath("sub");
+        const QString cleanA = QDir::cleanPath(dir.filePath("a.conf"));
+        const QString cleanB = QDir::cleanPath(dir.filePath("b.conf"));
+        const QString cleanC = QDir::cleanPath(dir.filePath("c.conf"));
+        write(cleanA, "a = 1\n");
+
+        QTextDocument text;
+        Document doc;
+        doc.attachDocument(&text);
+        QVERIFY(doc.open(dir.path() + "/./a.conf"));
+        QCOMPARE(doc.path(), cleanA);
+        QVERIFY(doc.open(dir.path() + "/sub/../a.conf"));
+        QCOMPARE(doc.path(), cleanA);
+
+        QVERIFY(QDir().rename(cleanA, cleanB));
+        doc.relocate(dir.path() + "/./a.conf", dir.path() + "/./b.conf");
+        QCOMPARE(doc.path(), cleanB);
+
+        QVERIFY(doc.saveAsUrl(QUrl::fromLocalFile(dir.path() + "/./c.conf")));
+        QCOMPARE(doc.path(), cleanC);
+        QCOMPARE(read(cleanC), QByteArray("a = 1\n"));
+
+        // `..` across a directory symlink resolves through the symlink first,
+        // matching POSIX rather than lexically collapsing `link/..`.
+        QDir(dir.path()).mkpath("work");
+        QDir(dir.path()).mkpath("data/sub");
+        write(dir.filePath("work/target.conf"), "wrong\n");
+        write(dir.filePath("data/target.conf"), "right\n");
+        QVERIFY(QFile::link(dir.filePath("data/sub"), dir.filePath("work/link")));
+        QVERIFY(doc.open(dir.path() + "/work/link/../target.conf"));
+        QCOMPARE(doc.path(), QFileInfo(dir.filePath("data/target.conf")).canonicalFilePath());
+        QCOMPARE(text.toPlainText(), QString("right\n"));
+        // `..` through a missing directory must not collapse into an existing file.
+        QVERIFY(!doc.open(dir.path() + "/work/missing/../target.conf"));
+        QCOMPARE(doc.problem(), QString("NotFound"));
+    }
+
+    void rehighlightsIdenticalTextWithNbsp()
+    {
+        QQmlEngine engine;
+        QQmlComponent component(&engine);
+        component.setData("import QtQuick\nTextEdit { textFormat: TextEdit.PlainText }", {});
+        std::unique_ptr<QQuickItem> edit(qobject_cast<QQuickItem *>(component.create()));
+        QVERIFY(edit);
+
+        QTemporaryDir dir;
+        const QByteArray bytes = QByteArray("# a\xC2\xA0" "b\n");
+        write(dir.filePath("a.conf"), bytes);
+        write(dir.filePath("b.lua"), bytes);
+
+        Document doc;
+        doc.attach(edit.get());
+        QTextDocument *text = edit->property("textDocument").value<QQuickTextDocument *>()->textDocument();
+        QVERIFY(doc.open(dir.filePath("a.conf")));
+        QVERIFY(!text->firstBlock().layout()->formats().isEmpty());
+        QVERIFY(text->firstBlock().layout()->formats().first().format.fontItalic());
+
+        QVERIFY(doc.open(dir.filePath("b.lua")));
+        QCOMPARE(doc.language(), QString("lua"));
+        QVERIFY(text->firstBlock().layout()->formats().isEmpty());
+    }
+
+    void fileTreeIndexOfEmptyAndDuplicateRootSymlink()
+    {
+        QTemporaryDir dir;
+        QDir(dir.path()).mkpath("root/sub");
+        const QString oldCwd = QDir::currentPath();
+        QVERIFY(QDir::setCurrent(dir.filePath("root/sub")));
+        FileTree tree;
+        tree.setRoot(dir.filePath("root"));
+        QVERIFY(tree.indexOf(dir.filePath("root/sub")) >= 0);
+        QCOMPARE(tree.indexOf(""), -1);
+        QVERIFY(QDir::setCurrent(oldCwd));
+
+        QVERIFY(QFile::link("/", dir.filePath("root/slash")));
+        QVERIFY(tree.duplicate(dir.filePath("root/slash")).contains("error"));
+        QVERIFY(!QFileInfo::exists(dir.filePath("root/slash copy")));
+    }
+
     // The sidebar itself, offscreen: a row dragged onto a folder moves into
     // it, and the open file follows with its edits.
     void dragsFilesIntoFolders()
@@ -1948,6 +2074,15 @@ private slots:
                  QString("wwwwwww..\n....kkkkkkk...n.cccc\n."));
         QCOMPARE(Highlighter::tokens("css", {"@define-color fg #ffcead; /* c */"}),
                  QString("wwwwwwwwwwwww....nnnnnnn..ccccccc"));
+        // Non-ASCII after # isn't a hex digit, and high-level Lua comments
+        // don't collide with Lua long strings.
+        QCOMPARE(Highlighter::tokens("css", {QStringLiteral("#é #abc")}),
+                 QString("...nnnn"));
+        const QString eq(100, '=');
+        const QString open = "--[" + eq + "[";
+        const QString close = "]" + eq + "]";
+        QCOMPARE(Highlighter::tokens("lua", {open, "still comment", close}),
+                 QString(open.size(), 'c') + "\n" + QString(13, 'c') + "\n" + QString(close.size(), 'c'));
     }
 
     // Edits, through a real TextEdit and its own undo stack.
@@ -2011,6 +2146,35 @@ private slots:
             QCOMPARE(Highlighter::tokens("css", {text().trimmed()}), QString(text().trimmed().size(), 'c'));
             editing.toggleComment(0, 0);
             QCOMPARE(text(), QString(".x::after { content: \"*\\/ and */\"; }\n"));
+            // Trailing spaces, empty comments, /*/ and two inline comments.
+            write(css, "/* color: red; */  \n");
+            QVERIFY(doc.open(css));
+            editing.toggleComment(0, 0);
+            QCOMPARE(text(), QString("color: red;  \n"));
+
+            write(css, "/* */\ncolor: red;\n");
+            QVERIFY(doc.open(css));
+            editing.toggleComment(0, 0);
+            QCOMPARE(text(), QString("\ncolor: red;\n"));
+
+            write(css, "/**/\ncolor: red;\n");
+            QVERIFY(doc.open(css));
+            editing.toggleComment(0, 0);
+            QCOMPARE(text(), QString("\ncolor: red;\n"));
+
+            write(css, "/*/\n");
+            QVERIFY(doc.open(css));
+            editing.toggleComment(0, 0);
+            QCOMPARE(text(), QString("/* /*\\/ */\n"));
+            editing.toggleComment(0, 0);
+            QCOMPARE(text(), QString("/*/\n"));
+
+            write(css, "/* a */ .x { } /* b */\n");
+            QVERIFY(doc.open(css));
+            editing.toggleComment(0, 0);
+            QCOMPARE(Highlighter::tokens("css", {text().trimmed()}), QString(text().trimmed().size(), 'c'));
+            editing.toggleComment(0, 0);
+            QCOMPARE(text(), QString("/* a */ .x { } /* b */\n"));
             QVERIFY(doc.open(path));
         }
 
@@ -2087,6 +2251,48 @@ private slots:
     {
         QVERIFY(PortalFilePicker::staticMetaObject.indexOfMethod("openFile(QString)") >= 0);
         QVERIFY(PortalFilePicker::staticMetaObject.indexOfMethod("saveFile(QString)") >= 0);
+    }
+
+    void portalFilePickerDefaultsToHomeAndClosesOnDestroy()
+    {
+        if (QStandardPaths::findExecutable("dbus-daemon").isEmpty())
+            QSKIP("needs dbus-daemon for a private bus");
+        QProcess daemon;
+        daemon.start("dbus-daemon", {"--session", "--print-address", "--nofork"});
+        QVERIFY(daemon.waitForReadyRead(5000));
+        const QString address = QString::fromUtf8(daemon.readLine()).trimmed();
+        QDBusConnection serviceBus = QDBusConnection::connectToBus(address, "portal-service");
+        QDBusConnection clientBus = QDBusConnection::connectToBus(address, "portal-client");
+        QVERIFY(serviceBus.isConnected() && clientBus.isConnected());
+        QVERIFY(serviceBus.registerService("org.freedesktop.portal.Desktop"));
+
+        FakePortalRequest request;
+        FakePortalChooser chooser(serviceBus, clientBus.baseService(), &request);
+        QVERIFY(serviceBus.registerObject("/org/freedesktop/portal/desktop", &chooser, QDBusConnection::ExportAllSlots));
+
+        const QByteArray expectedHome = QDir::homePath().toUtf8() + '\0';
+        {
+            PortalFilePicker picker(nullptr, clientBus);
+            // Empty folder falls back to $HOME rather than sending "\0".
+            picker.openFile("");
+            QTRY_VERIFY(!chooser.lastOptions.isEmpty());
+            QCOMPARE(chooser.lastOptions.value("current_folder").toByteArray(), expectedHome);
+
+            // Missing folder in saveFile also falls back to $HOME.
+            chooser.lastOptions.clear();
+            QTemporaryDir dir;
+            picker.saveFile(dir.filePath("missing/new.conf"));
+            QTRY_VERIFY(!chooser.lastOptions.isEmpty());
+            QCOMPARE(chooser.lastOptions.value("current_folder").toByteArray(), expectedHome);
+            request.closed = false;
+        }
+        // Destroying the picker closes any still-pending portal request.
+        QTRY_VERIFY(request.closed);
+
+        QDBusConnection::disconnectFromBus("portal-client");
+        QDBusConnection::disconnectFromBus("portal-service");
+        daemon.kill();
+        daemon.waitForFinished();
     }
 
     // Theme and translator, from the template.

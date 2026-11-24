@@ -214,6 +214,8 @@ int FileTree::reveal(const QString &path) {
 }
 
 int FileTree::indexOf(const QString &path) const {
+    if (path.isEmpty())
+        return -1;
     const QString clean = QDir::cleanPath(QFileInfo(path).absoluteFilePath());
     for (int i = 0; i < m_rows.size(); ++i)
         if (m_rows.at(i).path == clean)
@@ -380,7 +382,7 @@ QVariantMap FileTree::duplicate(const QString &source) {
         return {{"error", tr("%1 points at nothing to duplicate").arg(name)}};
     // A link to a folder the copy would land in would copy itself forever.
     const QString copyIn = QFileInfo(info.absolutePath()).canonicalFilePath();
-    if (copyIn == original || copyIn.startsWith(original + "/"))
+    if (copyIn == original || copyIn.startsWith(original == "/" ? original : original + "/"))
         return {{"error", tr("%1 can't be duplicated inside itself").arg(name)}};
     std::error_code error;
     std::filesystem::copy(QFile::encodeName(original).constData(), QFile::encodeName(to).constData(),
