@@ -158,6 +158,7 @@ Document::Decoded Document::decode(const QByteArray &input) {
 // newline is the empty last line the user can see.
 QByteArray Document::encode(const QTextDocument *document, bool bom, bool crlf) {
     QString text;
+    text.reserve(document->characterCount() + (crlf ? document->blockCount() : 0));
     const QString ending = crlf ? "\r\n" : "\n";
     for (QTextBlock block = document->begin(); block.isValid(); block = block.next()) {
         text += block.text().replace(ParagraphStandIn, QChar::ParagraphSeparator);
@@ -716,11 +717,10 @@ void Document::watch() {
     const QStringList watched = m_watcher.files() + m_watcher.directories();
     if (!watched.isEmpty())
         m_watcher.removePaths(watched);
-    if (m_path.isEmpty())
+    if (m_path.isEmpty() || m_target.isEmpty())
         return;
-    QStringList paths{m_path, QFileInfo(m_path).absolutePath()};
-    if (!m_target.isEmpty())
-        paths << m_target << QFileInfo(m_target).absolutePath();
+    QStringList paths{m_path, QFileInfo(m_path).absolutePath(),
+                      m_target, QFileInfo(m_target).absolutePath()};
     paths.removeDuplicates();
     for (const QString &path : paths)
         if (QFileInfo::exists(path))

@@ -225,13 +225,21 @@ QVariantList Editing::find(const QString &text, int from, bool backward, bool ca
 
 int Editing::matchCount(const QString &text, bool caseSensitive) const {
     QTextDocument *doc = document();
-    if (!doc || text.isEmpty())
+    if (!doc || text.isEmpty() || text.contains(u'\n') || text.contains(QChar::ParagraphSeparator))
         return 0;
+    const Qt::CaseSensitivity sensitivity = caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
     int count = 0;
-    QTextCursor cursor(doc);
-    const auto flags = caseSensitive ? QTextDocument::FindCaseSensitively : QTextDocument::FindFlags();
-    while (!(cursor = doc->find(text, cursor, flags)).isNull())
-        ++count;
+    for (QTextBlock block = doc->begin(); block.isValid(); block = block.next()) {
+        QString line = block.text();
+        // Match QTextDocument::find(), which treats NBSP as an ordinary space.
+        if (line.contains(QChar::Nbsp))
+            line.replace(QChar::Nbsp, u' ');
+        qsizetype pos = 0;
+        while ((pos = line.indexOf(text, pos, sensitivity)) >= 0) {
+            ++count;
+            pos += text.size();
+        }
+    }
     return count;
 }
 

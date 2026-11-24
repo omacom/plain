@@ -105,7 +105,7 @@ Item {
                 readonly property int line: view.firstLine + index
                 visible: line <= view.lastLine
                 // Re-read when anything moves the lines.
-                y: { flick.contentY; area.contentHeight; area.width; return area.positionToRectangle(editing.positionOfLine(line)).y - flick.contentY }
+                y: { if (!visible) return 0; flick.contentY; area.contentHeight; area.width; return area.positionToRectangle(editing.positionOfLine(line)).y - flick.contentY }
                 anchors.right: parent.right
                 anchors.rightMargin: 14
                 text: line
