@@ -42,7 +42,8 @@ Item {
         const cursor = area.cursorRectangle
         if (area.cursorPosition !== pagedTo)
             pageX = cursor.x
-        const step = Math.max(1, Math.floor(flick.height / cursor.height) - 1) * cursor.height
+        const lineHeight = Math.max(1, cursor.height)
+        const step = Math.max(1, Math.floor(flick.height / lineHeight) - 1) * lineHeight
         flick.contentY = Math.max(0, Math.min(flick.contentHeight - flick.height, flick.contentY + direction * step))
         const y = cursor.y + cursor.height / 2 + direction * step
         const position = y < 0 ? 0 : y > area.height ? area.length : area.positionAt(pageX, y)
@@ -200,7 +201,7 @@ Item {
                     else
                         area.cursorPosition = editing.replace(area.selectionStart, area.selectionEnd, doc.indentUnit)
                     event.accepted = true
-                } else if (event.key === Qt.Key_Backtab) {
+                } else if (event.key === Qt.Key_Backtab && plain) {
                     editing.outdent(area.selectionStart, area.selectionEnd)
                     event.accepted = true
                 }
