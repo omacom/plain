@@ -209,19 +209,8 @@ QVariantList Editing::find(const QString &text, int from, bool backward, bool ca
 
 int Editing::matchCount(const QString &text, bool caseSensitive) const {
     QTextDocument *doc = document();
-    if (!doc || text.isEmpty())
+    if (!doc || text.isEmpty() || text.contains(u'\n') || text.contains(QChar::ParagraphSeparator))
         return 0;
-    // Multi-line searches fall back to QTextDocument::find; single-line ones
-    // (everything FindBar passes) scan each block directly without building a
-    // QTextCursor per match.
-    if (text.contains(u'\n') || text.contains(QChar::ParagraphSeparator)) {
-        int count = 0;
-        QTextCursor cursor(doc);
-        const auto flags = caseSensitive ? QTextDocument::FindCaseSensitively : QTextDocument::FindFlags();
-        while (!(cursor = doc->find(text, cursor, flags)).isNull())
-            ++count;
-        return count;
-    }
     const Qt::CaseSensitivity sensitivity = caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
     int count = 0;
     for (QTextBlock block = doc->begin(); block.isValid(); block = block.next()) {
